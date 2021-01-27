@@ -25,11 +25,13 @@ public class AuthController {
 
   @RequestMapping(value = "/storeauthcode", method = RequestMethod.POST)
   public ResponseEntity storeauthcode(@RequestBody String code, @RequestHeader("X-Requested-With") String encoding) {
+    System.out.println("Storeauthcode: Hittar vi hit??!?!?!?!!");
     if (encoding == null || encoding.isEmpty()) {
+      System.out.println("Hittar vi hit?! BAD REQUEST!");
       // Without the `X-Requested-With` header, this request could be forged. Aborts.
       return new ResponseEntity("Error, wrong headers", HttpStatus.BAD_REQUEST);
     }
-
+    System.out.println("WHATS IN THE CODE!!!" + code);
     GoogleTokenResponse tokenResponse = null;
     try {
       tokenResponse = new GoogleAuthorizationCodeTokenRequest(
@@ -39,10 +41,12 @@ public class AuthController {
           CLIENT_ID,
           CLIENT_SECRET,
           code,
-          "http://localhost:" + SERVER_PORT) // Make sure you set the correct port
+          "http://localhost:8080") // Make sure you set the correct port
           .execute();
     } catch (IOException e) {
+      System.out.println("TokenResponse: catch, hoppsan!");
       e.printStackTrace();
+      return null;
     }
 
     // Store these 3 in your DB
