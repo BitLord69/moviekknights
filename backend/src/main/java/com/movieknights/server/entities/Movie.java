@@ -4,21 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.util.Date;
 import java.util.List;
 
-@Entity
-@Node("mkmovie")
 @Data
+@Node("mkmovie")
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 public class Movie {
-
     @Id
     private long id;
 
