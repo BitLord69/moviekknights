@@ -29,15 +29,13 @@ public class MovieService {
 
     public List<Movie> getAllMovies() {
         List<Movie> movies = new ArrayList<>();
-
-        for(int i = 11; i < 12; i++) {
+        for(int i = 1; i < 41; i++) {
             try {
                 movies.add(getMovieById(i));
             }
             catch (Exception e) {
                 System.out.println(e);
             }
-
         }
 
         return movies;
@@ -52,19 +50,20 @@ public class MovieService {
         Map<String, Object> movieMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + id + "?api_key=7641e2c988f78099d675e3e5a90a9a56&language=sv", Map.class);
         if(movieMap == null) return null;
 
+        Map<String, Object> creditsMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + id + "/credits?api_key=7641e2c988f78099d675e3e5a90a9a56", Map.class);
+        if(creditsMap == null) return null;
+
         HashSet<Genre> genres = new HashSet(getGenresForMovie((List<LinkedHashMap>) movieMap.get("genres"), id));
         HashSet<Person> directors = new HashSet();
-        HashSet<Person> cast = new HashSet();
+        HashSet<HasActor> cast = new HashSet();
         HashSet<Person> composers = new HashSet();
-        HashSet<HasActor> roles = new HashSet<>();
 
         Date releaseDate = new Date();
 
         try{
-            cast = new HashSet<>(getCastOrCrewByMovieId(id,"cast", "known_for_department", "Acting"));
-            directors = new HashSet<>(getCastOrCrewByMovieId(id,"crew", "job", "Director"));
-            composers = new HashSet<>(getCastOrCrewByMovieId(id,"crew", "job", "Original Music Composer"));
-//            roles = new HashSet<>(getRoles(cast))
+            cast = new HashSet<>(getCastByMovieId(creditsMap));
+            directors = new HashSet<>(getCrewByMovieId(creditsMap, "Director"));
+            composers = new HashSet<>(getCrewByMovieId(creditsMap, "Original Music Composer"));
         }
         catch (Exception e){
             System.out.println(e);
@@ -102,14 +101,6 @@ public class MovieService {
         return movie;
     }
 
-    public List<HasActor> getRoles(HashSet<Person> cast, String characterName, int order) {
-        List<HasActor> roles = new ArrayList<>();
-         cast.forEach(p -> {
-            roles.add(new HasActor(p, characterName, order));
-        });
-         return roles;
-    }
-
     public List<Genre> getGenresForMovie(List<LinkedHashMap> genresFromMovie, int id) {
         // keep maybe?
     //      Optional<Movie> optional = movieRepo.findById(id);
@@ -126,57 +117,75 @@ public class MovieService {
         return genres;
     }
 
-    public List<Person> getCastOrCrewByMovieId(int id, String listToGetFrom, String department, String typeOfWork) {
-//        Optional<Movie> optional = movieRepo.findById(id);
-//        if(optional.isPresent()) {
-//            return optional.get().getCredits();
-//        }
-
-        Map<String, Object> creditsMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + id + "/credits?api_key=7641e2c988f78099d675e3e5a90a9a56", Map.class);
-        if(creditsMap == null) return null;
-
-        List<Person> credits = ((List<Map<String, Object>>) creditsMap.get(listToGetFrom))
+    public List<HasActor> getCastByMovieId(Map<String, Object> castMap) {
+        List<HasActor> cast = new ArrayList<>();
+        List<Person> credits = ((List<Map<String, Object>>) castMap.get("cast"))
                 .stream()
                 .map(p -> {
-//                    Optional<Cast> castOptional = castRepo.findById((int) c.get("id"));
-//                    if(castOptional.isPresent()) {
-//                        return castOptional.get();
-//                    }
-                    Map<String, Object> personMap = restTemplate.getForObject("https://api.themoviedb.org/3/person/" + p.get("id") + "?api_key=7641e2c988f78099d675e3e5a90a9a56", Map.class);
-                    if(personMap == null) return null;
-                    // TODO: 2021-01-28 LOOK IF PROFILE_PATH IS NULL AND DO SOMETHING ABOUT IT
-                    Date dob = null;
-                    Date dod = null;
-                    try {
-                        if (personMap.get("birthday") != null) dob = new SimpleDateFormat("yyyy-MM-dd").parse((String) personMap.get("birthday"));
-                        else if (personMap.get("deathday") != null) dod = new SimpleDateFormat("yyyy-MM-dd").parse((String) personMap.get("deathday"));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
-                    Person person = new Person(
-                            (int) p.get("id"),
-                            dob,
-                            dod,
-                            (String) p.get("name"),
-                            "https://image.tmdb.org/t/p/original" + (String) p.get("profile_path"),
-                            (String) personMap.get("biography"),
-                            (String) personMap.get("homepage"),
-                            (String) personMap.get("imdb_id"),
-                            (int) p.get("gender"),
-                            (boolean) p.get("adult")
-                    );
-                    if(p.get(department).equals(typeOfWork)) {
-                        //personRepo.save(person);
-                        return person;
-                    } else {
+                    if(!p.get("known_for_department").equals("Acting")) {
                         return null;
+                    } else {
+                        Map<String, Object> personMap = restTemplate.getForObject("https://api.themoviedb.org/3/person/" + p.get("id") + "?api_key=7641e2c988f78099d675e3e5a90a9a56", Map.class);
+                        if(personMap == null) return null;
+
+                        Person person = createPerson(p, personMap);
+
+                        cast.add(new HasActor(person, (String) p.get("character"), (int) p.get("order")));
+
+                        return person;
                     }
                 })
                 .filter(p ->  p != null )
                 .collect(Collectors.toList());
 
 
+        return cast;
+    }
+
+    public List<Person> getCrewByMovieId(Map<String, Object> castMap, String typeOfJob) {
+        List<Person> credits = ((List<Map<String, Object>>) castMap.get("crew"))
+                .stream()
+                .map(p -> {
+                    if(!p.get("job").equals(typeOfJob)) {
+                        return null;
+                    } else {
+                        Map<String, Object> personMap = restTemplate.getForObject("https://api.themoviedb.org/3/person/" + p.get("id") + "?api_key=7641e2c988f78099d675e3e5a90a9a56", Map.class);
+                        if(personMap == null) return null;
+
+                        Person person = createPerson(p, personMap);
+
+                        return person;
+                    }
+                })
+                .filter(p ->  p != null )
+                .collect(Collectors.toList());
+
         return credits;
+    }
+
+    private Person createPerson(Map<String, Object> p, Map<String, Object> personMap) {
+        // TODO: 2021-01-28 LOOK IF PROFILE_PATH IS NULL AND DO SOMETHING ABOUT IT
+        Date dob = null;
+        Date dod = null;
+        try {
+            if (personMap.get("birthday") != null) dob = new SimpleDateFormat("yyyy-MM-dd").parse((String) personMap.get("birthday"));
+            else if (personMap.get("deathday") != null) dod = new SimpleDateFormat("yyyy-MM-dd").parse((String) personMap.get("deathday"));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        Person person = new Person(
+                (int) p.get("id"),
+                dob,
+                dod,
+                (String) p.get("name"),
+                "https://image.tmdb.org/t/p/original" + (String) p.get("profile_path"),
+                (String) personMap.get("biography"),
+                (String) personMap.get("homepage"),
+                (String) personMap.get("imdb_id"),
+                (int) p.get("gender"),
+                (boolean) p.get("adult")
+        );
+        return person;
     }
 }

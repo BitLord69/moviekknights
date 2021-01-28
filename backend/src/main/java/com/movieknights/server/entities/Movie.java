@@ -1,5 +1,6 @@
 package com.movieknights.server.entities;
 
+import com.movieknights.server.relationships.HasActor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,7 +39,7 @@ public class Movie {
     @Relationship(type = "HAS_DIRECTOR", direction = Relationship.Direction.OUTGOING)
     private HashSet<Person> directors;
     @Relationship(type = "HAS_ACTOR", direction = Relationship.Direction.OUTGOING)
-    private HashSet<Person> cast;
+    private HashSet<HasActor> cast;
     @Relationship(type = "HAS_COMPOSER", direction = Relationship.Direction.OUTGOING)
     private HashSet<Person> composers;
     private boolean adult;
