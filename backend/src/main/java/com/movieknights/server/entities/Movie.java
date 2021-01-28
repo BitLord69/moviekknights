@@ -30,7 +30,7 @@ public class Movie {
     private String status;
     private String posterPath;
     private String backdropPath;
-    private String releaseDate;
+    private Date releaseDate;
     private int runTime;
     private double popularity;
     @Relationship(type = "BELONGS_TO_GENRE", direction = Relationship.Direction.OUTGOING)

@@ -53,13 +53,21 @@ public class MovieService {
         HashSet<Person> cast = new HashSet();
         HashSet<Person> composers = new HashSet();
 
+        Date releaseDate = new Date();
+
         try{
-            directors = new HashSet<>(getCastByMovieId(id,"crew", "job", "Director"));
             cast = new HashSet<>(getCastByMovieId(id,"cast", "known_for_department", "Acting"));
+            directors = new HashSet<>(getCastByMovieId(id,"crew", "job", "Director"));
             composers = new HashSet<>(getCastByMovieId(id,"crew", "job", "Original Music Composer"));
         }
         catch (Exception e){
             System.out.println(e);
+        }
+
+        try {
+            releaseDate = new SimpleDateFormat("yyyy-MM-dd").parse((String) movieMap.get("release_date"));
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 //
 //        System.out.println("CREDITS TOSTRING " + credits.toString());
@@ -81,7 +89,7 @@ public class MovieService {
                 (String) movieMap.get("status"),
                 "https://image.tmdb.org/t/p/original" + movieMap.get("poster_path"),
                 "https://image.tmdb.org/t/p/original" + movieMap.get("backdrop_path"),
-                (String) movieMap.get("release_date"),
+                releaseDate,
                 (int) movieMap.get("runtime"),
                 (double) movieMap.get("popularity"),
                 genres,
@@ -105,7 +113,7 @@ public class MovieService {
         Map<String, Object> creditsMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + id + "/credits?api_key=7641e2c988f78099d675e3e5a90a9a56", Map.class);
         if(creditsMap == null) return null;
 
-        List<Person> cast = ((List<Map<String, Object>>) creditsMap.get(listToGetFrom))
+        List<Person> credits = ((List<Map<String, Object>>) creditsMap.get(listToGetFrom))
                 .stream()
                 .map(p -> {
 //                    Optional<Cast> castOptional = castRepo.findById((int) c.get("id"));
@@ -114,11 +122,20 @@ public class MovieService {
 //                    }
                     Map<String, Object> personMap = restTemplate.getForObject("https://api.themoviedb.org/3/person/" + p.get("id") + "?api_key=7641e2c988f78099d675e3e5a90a9a56", Map.class);
                     if(personMap == null) return null;
-                    // TODO: 2021-01-28 LOOK IF PROFILE_PATH IS NULL AND DO SOMETHING ABOUT IT 
+                    // TODO: 2021-01-28 LOOK IF PROFILE_PATH IS NULL AND DO SOMETHING ABOUT IT
+                    Date dob = null;
+                    Date dod = null;
+                    try {
+                        if (personMap.get("birthday") != null) dob = new SimpleDateFormat("yyyy-MM-dd").parse((String) personMap.get("birthday"));
+                        else if (personMap.get("deathday") != null) dod = new SimpleDateFormat("yyyy-MM-dd").parse((String) personMap.get("deathday"));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
                     Person person = new Person(
                             (int) p.get("id"),
-                            (String) personMap.get("birthday"),
-                            (String) personMap.get("deathday"),
+                            dob,
+                            dod,
                             (String) p.get("name"),
                             "https://image.tmdb.org/t/p/original" + (String) p.get("profile_path"),
                             (String) personMap.get("biography"),
@@ -138,6 +155,6 @@ public class MovieService {
                 .collect(Collectors.toList());
 
 
-        return cast;
+        return credits;
     }
 }
