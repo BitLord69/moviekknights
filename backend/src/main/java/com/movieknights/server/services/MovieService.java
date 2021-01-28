@@ -48,7 +48,7 @@ public class MovieService {
         Map<String, Object> movieMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + id + "?api_key=7641e2c988f78099d675e3e5a90a9a56&language=sv", Map.class);
         if(movieMap == null) return null;
 
-        HashSet<Genre> genres = new HashSet();
+        HashSet<Genre> genres = new HashSet(getGenresForMovie((List<LinkedHashMap>) movieMap.get("genres")));
         HashSet<Person> directors = new HashSet();
         HashSet<Person> cast = new HashSet();
         HashSet<Person> composers = new HashSet();
@@ -56,9 +56,9 @@ public class MovieService {
         Date releaseDate = new Date();
 
         try{
-            cast = new HashSet<>(getCastByMovieId(id,"cast", "known_for_department", "Acting"));
-            directors = new HashSet<>(getCastByMovieId(id,"crew", "job", "Director"));
-            composers = new HashSet<>(getCastByMovieId(id,"crew", "job", "Original Music Composer"));
+            cast = new HashSet<>(getCastOrCrewByMovieId(id,"cast", "known_for_department", "Acting"));
+            directors = new HashSet<>(getCastOrCrewByMovieId(id,"crew", "job", "Director"));
+            composers = new HashSet<>(getCastOrCrewByMovieId(id,"crew", "job", "Original Music Composer"));
         }
         catch (Exception e){
             System.out.println(e);
@@ -104,7 +104,24 @@ public class MovieService {
         return movie;
     }
 
-    public List<Person> getCastByMovieId(int id, String listToGetFrom, String department, String typeOfWork) {
+    public List<Genre> getGenresForMovie(List<LinkedHashMap> genresFromMovie) {
+//        Optional<Movie> optional = movieRepo.findById(id);
+//        if(optional.isPresent()) {
+//            return optional.get().getCredits();
+//        }
+
+        List<Genre> genres = new ArrayList<>();
+
+        genresFromMovie.forEach(o ->
+        {
+            genres.add(new Genre((int) o.get("id"), (String) o.get("name")));
+        });
+
+
+        return genres;
+    }
+
+    public List<Person> getCastOrCrewByMovieId(int id, String listToGetFrom, String department, String typeOfWork) {
 //        Optional<Movie> optional = movieRepo.findById(id);
 //        if(optional.isPresent()) {
 //            return optional.get().getCredits();
