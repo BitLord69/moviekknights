@@ -29,7 +29,6 @@ public class AuthController {
       // Without the `X-Requested-With` header, this request could be forged. Aborts.
       return new ResponseEntity("Error, wrong headers", HttpStatus.BAD_REQUEST);
     }
-
     GoogleTokenResponse tokenResponse = null;
     try {
       tokenResponse = new GoogleAuthorizationCodeTokenRequest(
@@ -39,10 +38,11 @@ public class AuthController {
           CLIENT_ID,
           CLIENT_SECRET,
           code,
-          "http://localhost:" + SERVER_PORT) // Make sure you set the correct port
+          "http://localhost:8080") // Make sure you set the correct port
           .execute();
     } catch (IOException e) {
       e.printStackTrace();
+      return null;
     }
 
     // Store these 3 in your DB
