@@ -18,8 +18,8 @@ public class Person {
     @Id
     private long id;
 
-    private Date dob;
-    private Date dod;
+    private String dob;
+    private String dod;
     private String name;
     private String profileImgPath;
     private String biography;
