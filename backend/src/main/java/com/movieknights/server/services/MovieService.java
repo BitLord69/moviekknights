@@ -69,14 +69,6 @@ public class MovieService {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-//
-//        System.out.println("CREDITS TOSTRING " + credits.toString());
-//
-//        for (Person cast : credits) {
-//            if (cast != null) {
-//                System.out.println("CREDITS: " + cast.getName());
-//            }
-//        }
 
         Movie movie = new Movie(
                 (int) movieMap.get("id"),
