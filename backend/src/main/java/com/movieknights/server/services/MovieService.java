@@ -3,6 +3,7 @@ package com.movieknights.server.services;
 import com.movieknights.server.entities.Genre;
 import com.movieknights.server.entities.Movie;
 import com.movieknights.server.entities.Person;
+import com.movieknights.server.relationships.HasActor;
 import com.movieknights.server.repos.GenreRepo;
 import com.movieknights.server.repos.MovieRepo;
 import com.movieknights.server.repos.PersonRepo;
@@ -55,6 +56,7 @@ public class MovieService {
         HashSet<Person> directors = new HashSet();
         HashSet<Person> cast = new HashSet();
         HashSet<Person> composers = new HashSet();
+        HashSet<HasActor> roles = new HashSet<>();
 
         Date releaseDate = new Date();
 
@@ -62,6 +64,7 @@ public class MovieService {
             cast = new HashSet<>(getCastOrCrewByMovieId(id,"cast", "known_for_department", "Acting"));
             directors = new HashSet<>(getCastOrCrewByMovieId(id,"crew", "job", "Director"));
             composers = new HashSet<>(getCastOrCrewByMovieId(id,"crew", "job", "Original Music Composer"));
+//            roles = new HashSet<>(getRoles(cast))
         }
         catch (Exception e){
             System.out.println(e);
@@ -97,6 +100,14 @@ public class MovieService {
         movieRepo.save(movie);
 
         return movie;
+    }
+
+    public List<HasActor> getRoles(HashSet<Person> cast, String characterName, int order) {
+        List<HasActor> roles = new ArrayList<>();
+         cast.forEach(p -> {
+            roles.add(new HasActor(p, characterName, order));
+        });
+         return roles;
     }
 
     public List<Genre> getGenresForMovie(List<LinkedHashMap> genresFromMovie, int id) {
