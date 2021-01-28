@@ -3,6 +3,7 @@ package com.movieknights.server.services;
 import com.movieknights.server.entities.Genre;
 import com.movieknights.server.entities.Movie;
 import com.movieknights.server.entities.Person;
+import com.movieknights.server.repos.GenreRepo;
 import com.movieknights.server.repos.MovieRepo;
 import com.movieknights.server.repos.PersonRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ public class MovieService {
     private MovieRepo movieRepo;
     @Autowired
     private PersonRepo personRepo;
+    @Autowired
+    private GenreRepo genreRepo;
 
     public List<Movie> getAllMovies() {
         List<Movie> movies = new ArrayList<>();
@@ -40,15 +43,15 @@ public class MovieService {
     }
 
     public Movie getMovieById(int id) {
-//        Optional<Movie> optional = movieRepo.findById(id);
-//        if(optional.isPresent()) {
-//            return optional.get();
-//        }
+        Optional<Movie> optional = movieRepo.findById((long) id);
+        if(optional.isPresent()) {
+            return optional.get();
+        }
 
         Map<String, Object> movieMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + id + "?api_key=7641e2c988f78099d675e3e5a90a9a56&language=sv", Map.class);
         if(movieMap == null) return null;
 
-        HashSet<Genre> genres = new HashSet(getGenresForMovie((List<LinkedHashMap>) movieMap.get("genres")));
+        HashSet<Genre> genres = new HashSet(getGenresForMovie((List<LinkedHashMap>) movieMap.get("genres"), id));
         HashSet<Person> directors = new HashSet();
         HashSet<Person> cast = new HashSet();
         HashSet<Person> composers = new HashSet();
@@ -91,24 +94,23 @@ public class MovieService {
                 (boolean) movieMap.get("adult")
         );
 
-        //movieRepo.save(movie);
+        movieRepo.save(movie);
 
         return movie;
     }
 
-    public List<Genre> getGenresForMovie(List<LinkedHashMap> genresFromMovie) {
-//        Optional<Movie> optional = movieRepo.findById(id);
-//        if(optional.isPresent()) {
-//            return optional.get().getCredits();
+    public List<Genre> getGenresForMovie(List<LinkedHashMap> genresFromMovie, int id) {
+        // keep maybe?
+    //      Optional<Movie> optional = movieRepo.findById(id);
+//          if(optional.isPresent()) {
+//            return optional.get().getGenres();
 //        }
-
         List<Genre> genres = new ArrayList<>();
 
         genresFromMovie.forEach(o ->
         {
             genres.add(new Genre((int) o.get("id"), (String) o.get("name")));
         });
-
 
         return genres;
     }
