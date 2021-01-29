@@ -26,6 +26,7 @@ export default {
 body {
   background-color: $bg-primary;
   font-size: 16px;
+  overflow-x: hidden;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
