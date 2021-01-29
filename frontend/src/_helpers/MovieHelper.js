@@ -1,4 +1,4 @@
-import { extFetch } from "./extFetch";
+import { extFetch } from "@/modules/extFetch";
 import { ref } from "vue";
 
 const url = "/rest/movies"
@@ -25,7 +25,6 @@ export default function MovieHelper(){
       return;
     }
   }
-
 
   return { getMovies, getMovieCount, movies, movieCount, movieError }
 }

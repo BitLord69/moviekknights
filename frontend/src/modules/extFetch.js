@@ -2,7 +2,7 @@ import authHeader from './auth-header';
 
 export async function extFetch(url, method, body, getFromProtectedPart = false) {
   if (url.startsWith('http://localhost/%27')) {
-    console.warn("Do not fetch http://localhost:5001/rest/etc, just write: '/rest/etc'")
+    console.warn("Do not fetch http://localhost:5050/rest/etc, just write: '/rest/etc'")
   }
 
   let headers = { 'content-type': 'application/json' };

@@ -3,7 +3,7 @@
   <Suspense>
     <Header />
   </Suspense>
-  <div class="rutaEtt">
+  <div class="rutaEtt" v-if="test">
 
     <h1>MOVIE KNIGHTS</h1>
     <h2>Whalecum to Mknights!</h2>
