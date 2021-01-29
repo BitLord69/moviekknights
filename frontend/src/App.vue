@@ -1,5 +1,4 @@
 <template>
-
   <Suspense>
     <Header />
   </Suspense>
