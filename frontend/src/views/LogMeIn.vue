@@ -1,5 +1,7 @@
 <template>
-  <Button @click="performLogin">Login with Google</Button>
+  <Button class="p-button-raised p-button-success" @click="performLogin">
+    <i class="fab fa-google p-mr-2"></i>Login with Google</Button
+  >
 </template>
 
 <script>
@@ -18,4 +20,4 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped></style>
