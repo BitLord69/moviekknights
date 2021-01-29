@@ -14,6 +14,7 @@ const routes = [
       import("../views/aboutpage.vue"),
   },
   {
+
     path: "/logmein",
     name: "LogMeIn",
     component: () =>
@@ -24,6 +25,13 @@ const routes = [
     name: "LogMeOut",
     component: () =>
       import("../views/LogMeOut.vue"),
+  },
+  {
+    path: "/movies",
+    name: "Movies",
+    component: () =>
+      import("../views/moviepage.vue"),
+
   },
 ];
 

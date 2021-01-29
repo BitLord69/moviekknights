@@ -1,8 +1,10 @@
 <template>
+
   <Suspense>
     <Header />
   </Suspense>
   <div class="rutaEtt">
+
     <h1>MOVIE KNIGHTS</h1>
     <h2>Whalecum to Mknights!</h2>
     <h3>Hoppsan kerstin!</h3>
@@ -15,6 +17,11 @@
 import Header from "@/components/Header.vue";
 export default {
   components: { Header },
+  setup() {
+    const test = false;
+
+    return { test }
+  }
 };
 </script>
 

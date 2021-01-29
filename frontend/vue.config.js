@@ -1,5 +1,6 @@
 module.exports = {
   devServer: {
+    //https: true,
     proxy: {
       '^/rest': {
         target: 'http://localhost:5050/',
