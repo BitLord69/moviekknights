@@ -23,11 +23,12 @@ public class MovieService {
 
     public List<Movie> getAllMovies() {
         List<Movie> movies = new ArrayList<>();
-        for(int i = 1; i < 101; i++) {
+        for(int i = 1; i <= 145; i++) {
             try {
                 movies.add(getMovieById(i));
             }
             catch (Exception e) {
+                System.out.println("ID: " + i);
                 System.out.println(e);
             }
         }
@@ -36,7 +37,7 @@ public class MovieService {
     }
 
     public Movie getMovieById(int id) {
-        Optional<Movie> optional = movieRepo.findById((long) id);
+        Optional<Movie> optional = movieRepo.findMovieById((long) id);
         if(optional.isPresent()) {
             return optional.get();
         }
