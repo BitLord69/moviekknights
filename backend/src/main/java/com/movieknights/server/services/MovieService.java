@@ -29,7 +29,7 @@ public class MovieService {
 
     public List<Movie> getAllMovies() {
         List<Movie> movies = new ArrayList<>();
-        for(int i = 1; i < 41; i++) {
+        for(int i = 1; i < 101; i++) {
             try {
                 movies.add(getMovieById(i));
             }
@@ -74,6 +74,10 @@ public class MovieService {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        String posterPath = "http://filmtropolis.se/noimage.png";
+        if(movieMap.get("poster_path") != null) {
+            posterPath = "https://image.tmdb.org/t/p/original" + movieMap.get("poster_path");
+        }
 
         Movie movie = new Movie(
                 (int) movieMap.get("id"),
@@ -84,7 +88,7 @@ public class MovieService {
                 (String) movieMap.get("overview"),
                 (String) movieMap.get("imdb_id"),
                 (String) movieMap.get("status"),
-                "https://image.tmdb.org/t/p/original" + movieMap.get("poster_path"),
+                posterPath,
                 "https://image.tmdb.org/t/p/original" + movieMap.get("backdrop_path"),
                 releaseDate,
                 (int) movieMap.get("runtime"),
@@ -164,7 +168,6 @@ public class MovieService {
     }
 
     private Person createPerson(Map<String, Object> p, Map<String, Object> personMap) {
-        // TODO: 2021-01-28 LOOK IF PROFILE_PATH IS NULL AND DO SOMETHING ABOUT IT
         Date dob = null;
         Date dod = null;
         try {
@@ -174,12 +177,17 @@ public class MovieService {
             e.printStackTrace();
         }
 
+        String profilePath = "http://filmtropolis.se/noimage.png";
+        if(p.get("profile_path") != null) {
+            profilePath = "https://image.tmdb.org/t/p/original" + (String) p.get("profile_path");
+        }
+
         Person person = new Person(
                 (int) p.get("id"),
                 dob,
                 dod,
                 (String) p.get("name"),
-                "https://image.tmdb.org/t/p/original" + (String) p.get("profile_path"),
+                profilePath,
                 (String) personMap.get("biography"),
                 (String) personMap.get("homepage"),
                 (String) personMap.get("imdb_id"),
