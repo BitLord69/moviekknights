@@ -4,9 +4,7 @@ import com.movieknights.server.entities.Genre;
 import com.movieknights.server.entities.Movie;
 import com.movieknights.server.entities.Person;
 import com.movieknights.server.relationships.HasActor;
-import com.movieknights.server.repos.GenreRepo;
 import com.movieknights.server.repos.MovieRepo;
-import com.movieknights.server.repos.PersonRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -22,10 +20,6 @@ public class MovieService {
 
     @Autowired
     private MovieRepo movieRepo;
-    @Autowired
-    private PersonRepo personRepo;
-    @Autowired
-    private GenreRepo genreRepo;
 
     public List<Movie> getAllMovies() {
         List<Movie> movies = new ArrayList<>();
@@ -53,57 +47,7 @@ public class MovieService {
         Map<String, Object> creditsMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + id + "/credits?api_key=7641e2c988f78099d675e3e5a90a9a56", Map.class);
         if(creditsMap == null) return null;
 
-        HashSet<Genre> genres = new HashSet(getGenresForMovie((List<LinkedHashMap>) movieMap.get("genres"), id));
-        HashSet<Person> directors = new HashSet();
-        HashSet<HasActor> cast = new HashSet();
-        HashSet<Person> composers = new HashSet();
-
-        Date releaseDate = new Date();
-
-        try{
-            cast = new HashSet<>(getCastByMovieId(creditsMap));
-            directors = new HashSet<>(getCrewByMovieId(creditsMap, "Director"));
-            composers = new HashSet<>(getCrewByMovieId(creditsMap, "Original Music Composer"));
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
-
-        try {
-            releaseDate = new SimpleDateFormat("yyyy-MM-dd").parse((String) movieMap.get("release_date"));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        String posterPath = "http://filmtropolis.se/noimage.png";
-        if(movieMap.get("poster_path") != null) {
-            posterPath = "https://image.tmdb.org/t/p/original" + movieMap.get("poster_path");
-        }
-
-        String backdropPath = "http://filmtropolis.se/noimagebackdrop.png";
-        if(movieMap.get("backdrop_path") != null) {
-            backdropPath = "https://image.tmdb.org/t/p/original" + movieMap.get("backdrop_path");
-        }
-
-        Movie movie = new Movie(
-                (int) movieMap.get("id"),
-                (String) movieMap.get("title"),
-                (String) movieMap.get("original_title"),
-                (String) movieMap.get("original_language"),
-                (String) movieMap.get("tagline"),
-                (String) movieMap.get("overview"),
-                (String) movieMap.get("imdb_id"),
-                (String) movieMap.get("status"),
-                posterPath,
-                backdropPath,
-                releaseDate,
-                (int) movieMap.get("runtime"),
-                (double) movieMap.get("popularity"),
-                genres,
-                directors,
-                cast,
-                composers,
-                (boolean) movieMap.get("adult")
-        );
+        Movie movie = createMovie(movieMap, creditsMap, id);
 
         movieRepo.save(movie);
 
@@ -111,11 +55,6 @@ public class MovieService {
     }
 
     public List<Genre> getGenresForMovie(List<LinkedHashMap> genresFromMovie, int id) {
-        // keep maybe?
-    //      Optional<Movie> optional = movieRepo.findById(id);
-//          if(optional.isPresent()) {
-//            return optional.get().getGenres();
-//        }
         List<Genre> genres = new ArrayList<>();
 
         genresFromMovie.forEach(o ->
@@ -172,9 +111,56 @@ public class MovieService {
         return credits;
     }
 
+    private Movie createMovie(Map<String, Object> movieMap, Map<String, Object> creditsMap, int id) {
+        HashSet<Genre> genres = new HashSet(getGenresForMovie((List<LinkedHashMap>) movieMap.get("genres"), id));
+        HashSet<Person> directors = new HashSet<>(getCrewByMovieId(creditsMap, "Director"));
+        HashSet<HasActor> cast = new HashSet<>(getCastByMovieId(creditsMap));
+        HashSet<Person> composers = new HashSet<>(getCrewByMovieId(creditsMap, "Original Music Composer"));
+        Date releaseDate = new Date();
+        String posterPath = null;
+        String backdropPath = null;
+
+        try{
+            releaseDate = new SimpleDateFormat("yyyy-MM-dd").parse((String) movieMap.get("release_date"));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if(movieMap.get("poster_path") != null) {
+            posterPath = "https://image.tmdb.org/t/p/original" + movieMap.get("poster_path");
+        }
+
+        if(movieMap.get("backdrop_path") != null) {
+            backdropPath = "https://image.tmdb.org/t/p/original" + movieMap.get("backdrop_path");
+        }
+
+        Movie movie = new Movie(
+                (int) movieMap.get("id"),
+                (String) movieMap.get("title"),
+                (String) movieMap.get("original_title"),
+                (String) movieMap.get("original_language"),
+                (String) movieMap.get("tagline"),
+                (String) movieMap.get("overview"),
+                (String) movieMap.get("imdb_id"),
+                (String) movieMap.get("status"),
+                posterPath,
+                backdropPath,
+                releaseDate,
+                (int) movieMap.get("runtime"),
+                (double) movieMap.get("popularity"),
+                genres,
+                directors,
+                cast,
+                composers,
+                (boolean) movieMap.get("adult")
+        );
+        return movie;
+    }
+
     private Person createPerson(Map<String, Object> p, Map<String, Object> personMap) {
         Date dob = null;
         Date dod = null;
+        String profilePath = null;
         try {
             if (personMap.get("birthday") != null) dob = new SimpleDateFormat("yyyy-MM-dd").parse((String) personMap.get("birthday"));
             else if (personMap.get("deathday") != null) dod = new SimpleDateFormat("yyyy-MM-dd").parse((String) personMap.get("deathday"));
@@ -182,7 +168,6 @@ public class MovieService {
             e.printStackTrace();
         }
 
-        String profilePath = "http://filmtropolis.se/noimage.png";
         if(p.get("profile_path") != null) {
             profilePath = "https://image.tmdb.org/t/p/original" + (String) p.get("profile_path");
         }
