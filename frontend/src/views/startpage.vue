@@ -12,8 +12,7 @@ export default {
   components: {},
   setup() {
     let gapi = window.gapi;
-    const CLIENT_ID =
-      "205088827578-u7c23dj0t8mrlt305c8vdnpjcufgsffb.apps.googleusercontent.com";
+    const CLIENT_ID = "205088827578-u7c23dj0t8mrlt305c8vdnpjcufgsffb.apps.googleusercontent.com";
     
     
     let auth2;

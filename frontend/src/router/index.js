@@ -13,6 +13,12 @@ const routes = [
     component: () =>
       import("../views/aboutpage.vue"),
   },
+  {
+    path: "/movies",
+    name: "Movies",
+    component: () =>
+      import("../views/moviepage.vue"),
+  },
 ];
 
 const router = createRouter({
