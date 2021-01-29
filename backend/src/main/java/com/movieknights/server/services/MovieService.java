@@ -79,6 +79,11 @@ public class MovieService {
             posterPath = "https://image.tmdb.org/t/p/original" + movieMap.get("poster_path");
         }
 
+        String backdropPath = "http://filmtropolis.se/noimagebackdrop.png";
+        if(movieMap.get("backdrop_path") != null) {
+            backdropPath = "https://image.tmdb.org/t/p/original" + movieMap.get("backdrop_path");
+        }
+
         Movie movie = new Movie(
                 (int) movieMap.get("id"),
                 (String) movieMap.get("title"),
@@ -89,7 +94,7 @@ public class MovieService {
                 (String) movieMap.get("imdb_id"),
                 (String) movieMap.get("status"),
                 posterPath,
-                "https://image.tmdb.org/t/p/original" + movieMap.get("backdrop_path"),
+                backdropPath,
                 releaseDate,
                 (int) movieMap.get("runtime"),
                 (double) movieMap.get("popularity"),
