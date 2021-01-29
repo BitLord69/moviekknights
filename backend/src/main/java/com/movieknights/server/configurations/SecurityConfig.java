@@ -40,6 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .antMatchers("/api/auth/storeauthcode").permitAll()
         .antMatchers( "/").permitAll()
+        .antMatchers(HttpMethod.GET, "/rest/movies/").permitAll()
         .anyRequest().authenticated();
     ;
 
@@ -65,6 +66,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     web.ignoring().antMatchers(
         HttpMethod.POST,
         "/api/auth/storeauthcode"
-    );
+    ).antMatchers(HttpMethod.GET, "/rest/movies/");
   }
 }

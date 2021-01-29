@@ -6,6 +6,10 @@ module.exports = {
         target: 'http://localhost:5050/',
         changeOrigin: true,
       },
+      '^/rest/movies': {
+        target: 'http://localhost:5050/',
+        changeOrigin: true,
+      },
       '^/api': {
         target: 'http://localhost:5050/',
         changeOrigin: true,
