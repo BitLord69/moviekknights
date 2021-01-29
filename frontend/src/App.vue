@@ -55,6 +55,18 @@ h3 {
   color: $text-primary;
 }
 
+.p-paginator{
+  background-color: $bg-secondary !important;
+  .p-button{
+    border: $border-primary;
+    background-color: $bg-secondary !important;
+    .p-button-icon{
+      color: $text-secondary;
+    }
+  }
+
+}
+
 //Test
 .rutaEtt {
   width: 400px;

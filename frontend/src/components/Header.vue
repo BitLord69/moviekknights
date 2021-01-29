@@ -33,7 +33,7 @@ export default {
 <style lang="scss" scoped>
 @import "@/styles/_variables.scss";
 #nav {
-  padding: 30px;
+  padding: 10px 30px 30px 30px;
 }
 
 #nav a {
