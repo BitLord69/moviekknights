@@ -1,5 +1,5 @@
 <template>
-  <div class="movie" :style="{backgroundImage: `url(${movie.posterPath})`}">
+  <div class="movie" :style="{backgroundImage: `url(${movie.posterPath != null ? movie.posterPath : '/img/noimage.png'})`}">
     <div class="movie-info p-py-2">
       <span class="p-mx-2">{{movie.title}}</span>
     </div>

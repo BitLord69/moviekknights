@@ -187,4 +187,8 @@ public class MovieService {
         );
         return person;
     }
+
+    public int getCount() {
+        return movieRepo.getCount();
+    }
 }

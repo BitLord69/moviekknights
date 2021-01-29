@@ -28,4 +28,9 @@ public class MovieController {
         Movie movie = movieService.getMovieById(id);
         return movie;
     }
+
+    @GetMapping("/count")
+    public int getCountOfMoviesInDb() {
+        return movieService.getCount();
+    }
 }

@@ -5,6 +5,8 @@ import VueGapi from "vue-gapi";
 
 //Primevue
 import PrimeVue from "primevue/config";
+import Paginator from 'primevue/paginator';
+import Button from 'primevue/button';
 
 import "primeflex/primeflex.css";
 import "primeicons/primeicons.css";
@@ -18,4 +20,6 @@ app.use(VueGapi, {
   discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
   scope: 'https://www.googleapis.com/auth/calendar'
 })
+app.component("Paginator", Paginator);
+app.component("Button", Button);
 app.use(router).mount('#app')
