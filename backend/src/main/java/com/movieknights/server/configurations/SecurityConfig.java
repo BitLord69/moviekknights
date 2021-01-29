@@ -38,6 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
         .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
         .authorizeRequests()
+        .antMatchers("/api/auth/whoami").permitAll()
         .antMatchers("/api/auth/storeauthcode").permitAll()
         .antMatchers( "/").permitAll()
         .anyRequest().authenticated();
@@ -59,12 +60,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     return super.authenticationManagerBean();
   }
 
-  @Override
-  public void configure(WebSecurity web) throws Exception {
-    // TokenAuthenticationFilter will ignore the below paths
-    web.ignoring().antMatchers(
-        HttpMethod.POST,
-        "/api/auth/storeauthcode"
-    );
-  }
+//  @Override
+//  public void configure(WebSecurity web) throws Exception {
+//    // TokenAuthenticationFilter will ignore the below paths
+////    web.ignoring().antMatchers(
+////        HttpMethod.POST,
+////        "/api/auth/storeauthcode"
+////    );
+//////    web.ignoring().antMatchers(
+//////        HttpMethod.GET,
+//////        "/api/auth/whoami"
+//////    );
+//  }
 }

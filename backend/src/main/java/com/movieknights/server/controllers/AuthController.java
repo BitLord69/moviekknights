@@ -37,13 +37,14 @@ public class AuthController {
   private String PASSWORD_SALT;
 
   @Autowired
+  private UserRepo userRepo;
+
+  @Autowired
   AuthenticationManager authenticationManager;
 
   @Autowired
   JwtUtils jwtUtils;
 
-  @Autowired
-  UserRepo userRepo;
 
   @Autowired
   UserDetailsServiceImpl userService;
@@ -79,6 +80,22 @@ public class AuthController {
 
     // Authenticate and return user details
     return authenticateUser(user);
+  }
+
+  @GetMapping("/whoami")
+  public ResponseEntity whoAmI() {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null) {
+      System.out.println("whoami authentication is null");
+      return ResponseEntity.ok(new NotLoggedInError());
+    }
+
+    String username = authentication.getName();
+    if (username.equals("anonymousUser")) {
+      System.out.println("whoami anonymousUser");
+      return ResponseEntity.ok(new NotLoggedInError());
+    }
+    return ResponseEntity.ok(userRepo.findById(username).get());
   }
 
   private ResponseEntity<JwtResponse> authenticateUser(User user) {
