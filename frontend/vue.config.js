@@ -16,12 +16,12 @@ module.exports = {
         // pathRewrite: { "^/api/": "/api/" },
         logLevel: "debug",
       },
-      '^/api/auth/storeauthcode': {
-        target: 'http://localhost:5050/',
-        changeOrigin: true,
-        // pathRewrite: { "^/api/": "/api/" },
-        logLevel: "debug",
-      },
+      // '^/api/auth/storeauthcode': {
+      //   target: 'http://localhost:5050/',
+      //   changeOrigin: true,
+      //   // pathRewrite: { "^/api/": "/api/" },
+      //   logLevel: "debug",
+      // },
     }
   }
 }
