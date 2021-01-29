@@ -13,6 +13,18 @@ const routes = [
     component: () =>
       import("../views/aboutpage.vue"),
   },
+  {
+    path: "/logmein",
+    name: "LogMeIn",
+    component: () =>
+      import("../views/LogMeIn.vue"),
+  },
+  {
+    path: "/logmeout",
+    name: "LogMeOut",
+    component: () =>
+      import("../views/LogMeOut.vue"),
+  },
 ];
 
 const router = createRouter({

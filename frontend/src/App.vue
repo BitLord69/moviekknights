@@ -1,5 +1,7 @@
 <template>
-  <Header />
+  <Suspense>
+    <Header />
+  </Suspense>
   <div class="rutaEtt">
     <h1>MOVIE KNIGHTS</h1>
     <h2>Whalecum to Mknights!</h2>
