@@ -22,7 +22,8 @@
 
   <div class="movies">
     <Paginator v-model:first="state.first" :rows="18" :totalRecords="movieCount" class="paginator"
-      template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink">
+      template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+      currentPageReportTemplate="({currentPage} av {totalPages})">
       <template #left>
         <Button type="button" icon="pi pi-refresh" @click="reset()"/>
       </template>
