@@ -33,4 +33,9 @@ public class MovieController {
     public int getCountOfMoviesInDb() {
         return movieService.getCount();
     }
+
+    @GetMapping("/db")
+    public List<Movie> getTheMoviesFromDb() {
+        return movieService.getMoviesFromDb();
+    }
 }

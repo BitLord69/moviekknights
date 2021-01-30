@@ -22,14 +22,17 @@ public class MovieService {
     private MovieRepo movieRepo;
 
     public List<Movie> getAllMovies() {
+        int countFor404 = 0;
         List<Movie> movies = new ArrayList<>();
-        for(int i = 1; i <= 145; i++) {
+        for(int i = 4001; i <= 4200; i++) {
             try {
                 movies.add(getMovieById(i));
             }
             catch (Exception e) {
+                countFor404++;
                 System.out.println("ID: " + i);
                 System.out.println(e);
+                System.out.println("Antal 404: " + countFor404);
             }
         }
 
@@ -37,13 +40,15 @@ public class MovieService {
     }
 
     public Movie getMovieById(int id) {
-        Optional<Movie> optional = movieRepo.findMovieById((long) id);
+        Optional<Movie> optional = movieRepo.findMovieByMovieId((long) id);
         if(optional.isPresent()) {
             return optional.get();
         }
 
         Map<String, Object> movieMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + id + "?api_key=7641e2c988f78099d675e3e5a90a9a56&language=sv", Map.class);
-        if(movieMap == null) return null;
+        if(movieMap == null) {
+            return null;
+        }
 
         Map<String, Object> creditsMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + id + "/credits?api_key=7641e2c988f78099d675e3e5a90a9a56", Map.class);
         if(creditsMap == null) return null;
@@ -190,5 +195,9 @@ public class MovieService {
 
     public int getCount() {
         return movieRepo.getCount();
+    }
+
+    public List<Movie> getMoviesFromDb() {
+        return movieRepo.getAllMoviesInDb();
     }
 }

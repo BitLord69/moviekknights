@@ -10,7 +10,7 @@ import org.springframework.data.neo4j.core.schema.Node;
 import java.util.Date;
 
 @Data
-@Node("mkperson")
+@Node("MKPerson")
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString

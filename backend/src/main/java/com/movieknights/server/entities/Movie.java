@@ -14,13 +14,13 @@ import java.util.HashSet;
 import java.util.List;
 
 @Data
-@Node("mkmovie")
+@Node("MKMovie")
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 public class Movie {
     @Id
-    private long id;
+    private long movieId;
 
     private String title;
     private String originalTitle;
