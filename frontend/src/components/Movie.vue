@@ -21,7 +21,7 @@ export default {
 <style lang="scss" scope>
 @import "@/styles/_variables.scss";
   .movie{
-    width: 170px;
+    width: 100%;
     height: 250px;
     background-size: 100% 100%;
     position: relative;
