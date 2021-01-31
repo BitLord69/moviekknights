@@ -6,6 +6,7 @@ import com.movieknights.server.entities.Person;
 import com.movieknights.server.relationships.HasActor;
 import com.movieknights.server.repos.MovieRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,7 +25,7 @@ public class MovieService {
     public List<Movie> getAllMovies() {
         int countFor404 = 0;
         List<Movie> movies = new ArrayList<>();
-        for(int i = 4001; i <= 4200; i++) {
+        for(int i = 1; i <= 5000; i++) {
             try {
                 movies.add(getMovieById(i));
             }
@@ -39,8 +40,9 @@ public class MovieService {
         return movies;
     }
 
-    public Movie getMovieById(int id) {
-        Optional<Movie> optional = movieRepo.findMovieByMovieId((long) id);
+    public Movie getMovieById(long id) {
+        //Optional<Movie> optional = movieRepo.findMovieByMovieId((long) id);
+        Optional<Movie> optional = movieRepo.findById(id);
         if(optional.isPresent()) {
             return optional.get();
         }
@@ -60,7 +62,7 @@ public class MovieService {
         return movie;
     }
 
-    public List<Genre> getGenresForMovie(List<LinkedHashMap> genresFromMovie, int id) {
+    public List<Genre> getGenresForMovie(List<LinkedHashMap> genresFromMovie, long id) {
         List<Genre> genres = new ArrayList<>();
 
         genresFromMovie.forEach(o ->
@@ -76,9 +78,6 @@ public class MovieService {
         List<Person> credits = ((List<Map<String, Object>>) castMap.get("cast"))
                 .stream()
                 .map(p -> {
-                    if(!p.get("known_for_department").equals("Acting")) {
-                        return null;
-                    } else {
                         Map<String, Object> personMap = restTemplate.getForObject("https://api.themoviedb.org/3/person/" + p.get("id") + "?api_key=7641e2c988f78099d675e3e5a90a9a56", Map.class);
                         if(personMap == null) return null;
 
@@ -87,7 +86,6 @@ public class MovieService {
                         cast.add(new HasActor(person, (String) p.get("character"), (int) p.get("order")));
 
                         return person;
-                    }
                 })
                 .filter(p ->  p != null )
                 .collect(Collectors.toList());
@@ -117,7 +115,7 @@ public class MovieService {
         return credits;
     }
 
-    private Movie createMovie(Map<String, Object> movieMap, Map<String, Object> creditsMap, int id) {
+    private Movie createMovie(Map<String, Object> movieMap, Map<String, Object> creditsMap, long id) {
         HashSet<Genre> genres = new HashSet(getGenresForMovie((List<LinkedHashMap>) movieMap.get("genres"), id));
         HashSet<Person> directors = new HashSet<>(getCrewByMovieId(creditsMap, "Director"));
         HashSet<HasActor> cast = new HashSet<>(getCastByMovieId(creditsMap));
@@ -193,11 +191,11 @@ public class MovieService {
         return person;
     }
 
-    public int getCount() {
-        return movieRepo.getCount();
+    public long getCount() {
+        return movieRepo.count();
     }
 
     public List<Movie> getMoviesFromDb() {
-        return movieRepo.getAllMoviesInDb();
+        return movieRepo.findAll(Sort.by(Sort.Direction.DESC, "popularity"));
     }
 }

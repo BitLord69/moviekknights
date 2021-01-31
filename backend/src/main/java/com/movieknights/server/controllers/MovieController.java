@@ -24,13 +24,13 @@ public class MovieController {
     }
 
     @GetMapping("/{id}")
-    public Movie getMovieById(@PathVariable int id) {
+    public Movie getMovieById(@PathVariable long id) {
         Movie movie = movieService.getMovieById(id);
         return movie;
     }
 
     @GetMapping("/count")
-    public int getCountOfMoviesInDb() {
+    public long getCountOfMoviesInDb() {
         return movieService.getCount();
     }
 
