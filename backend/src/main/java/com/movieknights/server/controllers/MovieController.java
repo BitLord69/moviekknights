@@ -1,10 +1,14 @@
 package com.movieknights.server.controllers;
 
 import com.movieknights.server.services.MovieService;
+import com.movieknights.server.entities.Movie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("rest/movies")
@@ -14,7 +18,24 @@ public class MovieController {
     private MovieService movieService;
 
     @GetMapping("/")
-    public void getAll() {
-        System.out.println("Hej hopp i getAll!");
+    public List<Movie> getAll() {
+        List<Movie> allMovies = movieService.getAllMovies();
+        return allMovies;
+    }
+
+    @GetMapping("/{id}")
+    public Movie getMovieById(@PathVariable long id) {
+        Movie movie = movieService.getMovieById(id);
+        return movie;
+    }
+
+    @GetMapping("/count")
+    public long getCountOfMoviesInDb() {
+        return movieService.getCount();
+    }
+
+    @GetMapping("/db")
+    public List<Movie> getTheMoviesFromDb() {
+        return movieService.getMoviesFromDb();
     }
 }

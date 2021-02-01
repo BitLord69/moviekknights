@@ -2,13 +2,16 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import VueGapi from "vue-gapi";
-import PrimeVue from 'primevue/config';
-import 'primevue/resources/themes/saga-blue/theme.css';       
-import 'primevue/resources/primevue.min.css';                 
-import 'primeicons/primeicons.css';                           
-import 'primeflex/primeflex.css';
 
-import Button from "primevue/button";
+//Primevue
+import PrimeVue from "primevue/config";
+import Paginator from 'primevue/paginator';
+import Button from 'primevue/button';
+
+import "primeflex/primeflex.css";
+import "primeicons/primeicons.css";
+import "primevue/resources/primevue.min.css";
+import 'primevue/resources/themes/arya-blue/theme.css';
 
 const app = createApp(App);
 app.use(VueGapi, {
@@ -19,6 +22,7 @@ app.use(VueGapi, {
 })
 app.use(PrimeVue, { ripple: true });
 app.use(router);
+app.component("Paginator", Paginator);
 app.component("Button", Button);
 
 app.mount('#app')

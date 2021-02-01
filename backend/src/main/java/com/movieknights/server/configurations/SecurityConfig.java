@@ -42,6 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/api/auth/whoami").permitAll()
         .antMatchers("/api/auth/storeauthcode").permitAll()
         .antMatchers( "/").permitAll()
+        .antMatchers(HttpMethod.GET, "/rest/movies/*").permitAll()
         .anyRequest().authenticated();
     ;
 

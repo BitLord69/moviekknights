@@ -1,8 +1,8 @@
 <template>
   <div id="nav">
     <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
     <router-link to="/movies">Movies</router-link> |
+    <router-link to="/about">About</router-link> |
     <span v-if="isLoggedIn">
       <router-link to="/logmeout"> Log out </router-link>
       </span>
@@ -33,7 +33,7 @@ export default {
 <style lang="scss" scoped>
 @import "@/styles/_variables.scss";
 #nav {
-  padding: 30px;
+  padding: 10px 30px 30px 30px;
 }
 
 #nav a {
