@@ -31,7 +31,12 @@ const routes = [
     name: "Movies",
     component: () =>
       import("../views/moviepage.vue"),
-
+  },
+  {
+    path: "/calendar",
+    name: "Calendar",
+    component: () =>
+      import("../views/calendarpage.vue"),
   },
 ];
 

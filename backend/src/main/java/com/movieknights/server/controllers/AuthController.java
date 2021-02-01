@@ -141,7 +141,6 @@ public class AuthController {
     user.setName((String)payload.get("name"));
     user.setPictureUrl((String)payload.get("picture"));
 
-    userRepo.save(user);
-    return user;
+    return userRepo.save(user);
   }
 }

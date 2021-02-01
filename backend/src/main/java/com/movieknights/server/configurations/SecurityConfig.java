@@ -38,6 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
         .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
         .authorizeRequests()
+        .antMatchers("/rest/calendar/freebusy").permitAll()
         .antMatchers("/api/auth/whoami").permitAll()
         .antMatchers("/api/auth/storeauthcode").permitAll()
         .antMatchers( "/").permitAll()
