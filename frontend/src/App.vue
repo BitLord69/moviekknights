@@ -1,9 +1,8 @@
 <template>
-
   <Suspense>
     <Header />
   </Suspense>
-  <div class="rutaEtt">
+  <div class="rutaEtt" v-if="test">
 
     <h1>MOVIE KNIGHTS</h1>
     <h2>Whalecum to Mknights!</h2>
@@ -30,6 +29,7 @@ export default {
 body {
   background-color: $bg-primary;
   font-size: 16px;
+  overflow-x: hidden;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -53,6 +53,18 @@ h2 {
 h3 {
   font-family: "Sarala", sans-serif;
   color: $text-primary;
+}
+
+.p-paginator{
+  background-color: $bg-secondary !important;
+  .p-button{
+    border: $border-primary;
+    background-color: $bg-secondary !important;
+    .p-button-icon{
+      color: $text-secondary;
+    }
+  }
+
 }
 
 //Test

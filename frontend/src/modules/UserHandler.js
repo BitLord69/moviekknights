@@ -14,8 +14,6 @@ export default function UserHandler() {
   const router = useRouter();
   
   async function signInCallback(authResult) {
-    console.log("authResult", authResult);
-
     if (authResult["code"]) {
       // Hide the sign-in button now that the user is authorized
       // Send the code to the server
@@ -27,12 +25,10 @@ export default function UserHandler() {
         },
         body: authResult["code"],
       });
-      console.log("signInCallback, result:", result);
 
       let result2 = await result.json();
-      console.log("result2:", result2);
+      
       if (result2.accessToken) {
-        console.log("Storing ", result2, " in local storage!!!");
         localStorage.setItem("user", JSON.stringify(result2));
       }
       loginError.value = null;
@@ -43,7 +39,6 @@ export default function UserHandler() {
       isLoggedIn.value = false;
       currentUser.value = null;
       loginError.value = "Bad username and/or password!";
-      console.log("Wrong username/password");
     }
   }
 
@@ -72,7 +67,6 @@ export default function UserHandler() {
 
     try {
       result = await extFetch("/api/auth/whoami", "GET", undefined, true);
-      console.log("whoami result:", result);
       if (result.error) {
         isLoggedIn.value = false;
         userError.value = result.error;

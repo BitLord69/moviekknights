@@ -8,7 +8,7 @@ import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
 @Data
-@Node("mkgenre")
+@Node("MKGenre")
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
