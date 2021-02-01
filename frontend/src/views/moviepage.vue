@@ -1,26 +1,7 @@
 <template>
-<!-- <div class="p-grid nested-grid">
-  <div class="p-lg-2 p-col-0"></div>
-  <Paginator v-model:first="state.first" :rows="18" :totalRecords="movieCount"
-    template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" class="p-jc-center p-col-12 p-lg-8">
-    <template #left>
-      <Button type="button" icon="pi pi-refresh" @click="reset()"/>
-    </template>
-    <template #right>
-      <Button type="button" icon="pi pi-search" />
-    </template>
-  </Paginator>
-  <div class="p-lg-2 p-col-0"></div>
-  <div class="movie-container p-grid p-mt-1 p-jc-center">
-    <div class="p-lg-2"></div>
-    <div id="movie-page" class="p-grid p-lg-8 p-jc-evenly">
-        <Movie class="p-col-12 p-md-6 p-lg-1 p-m-2" :movie="movie" v-for="(movie, index) in state.pagMovies && state.pagMovies.slice(state.first, state.first+18)" :key="index"/>
-    </div>
-    <div class="p-lg-2"></div>
-  </div>
-</div> -->
-
   <div class="movies">
+    <div>Antal filmer i db: {{movieCount}}</div>
+    
     <Paginator v-model:first="state.first" :rows="18" :totalRecords="movieCount" class="paginator"
       template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
       currentPageReportTemplate="({currentPage} av {totalPages})">
@@ -33,8 +14,9 @@
     </Paginator>
     
     <div id="movie-page">
-        <Movie :movie="movie" v-for="(movie, index) in state.pagMovies && state.pagMovies.slice(state.first, state.first+18)" :key="index"/>
+        <Movie :movie="movie" v-for="(movie, index) in state.pagMovies && state.pagMovies.slice(state.first, state.first+18)" :key="index" @click="displayMovieInfo(movie)"/>
     </div>
+        <MovieInfoModal v-if="state.showMovieInfo" :movie="state.selectedMovie"/>
     
   </div>
 
@@ -44,17 +26,20 @@
 <script>
 
 import Movie from "@/components/Movie.vue";
+import MovieInfoModal from "@/components/MovieInfoModal.vue";
 import MovieHelper from "@/_helpers/MovieHelper";
 import { reactive, onMounted } from 'vue';
 
 export default {
   name: "Movies",
-  components: { Movie },
+  components: { Movie, MovieInfoModal },
   setup(){
     const { getMovies, getMovieCount, movies, movieCount, movieError } = MovieHelper();
     let state = reactive({
       first: 0,
-      pagMovies: movies
+      pagMovies: movies,
+      showMovieInfo: false,
+      selectedMovie: null
     })
 
     onMounted(async () => {
@@ -62,7 +47,16 @@ export default {
       await getMovieCount();
     })
 
-    return { state, movies, movieCount, movieError}
+    function reset() {
+      state.first = 0;
+    }
+
+    function displayMovieInfo(movie) {
+      state.showMovieInfo = !state.showMovieInfo;
+      state.selectedMovie = movie
+    }
+
+    return { state, movies, movieCount, movieError, displayMovieInfo, reset}
   }
 }
 </script>
@@ -90,8 +84,5 @@ export default {
     row-gap: 12px;
     column-gap: 13px;
     justify-content: center;
-    .movie{
-
-    }
   }
 </style>
