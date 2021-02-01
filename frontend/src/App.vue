@@ -2,12 +2,6 @@
   <Suspense>
     <Header />
   </Suspense>
-  <div class="rutaEtt" v-if="test">
-
-    <h1>MOVIE KNIGHTS</h1>
-    <h2>Whalecum to Mknights!</h2>
-    <h3>Hoppsan kerstin!</h3>
-  </div>
   <router-view />
 </template>
 
@@ -32,11 +26,11 @@ body {
   overflow-x: hidden;
 }
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: $text-primary;
+  font-family: "Sarala", sans-serif;
 }
 
 h1 {
@@ -57,22 +51,21 @@ h3 {
 
 .p-paginator{
   background-color: $bg-secondary !important;
-  .p-button{
-    border: $border-primary;
-    background-color: $bg-secondary !important;
-    .p-button-icon{
-      color: $text-secondary;
-    }
-  }
-
 }
-
-//Test
-.rutaEtt {
-  width: 400px;
-  background-color: $bg-secondary;
-  border: $border-primary;
-  border-radius: $border-radius;
+.p-button{
+  color: $text-secondary !important;
+  font-family: inherit !important;
+  border: $border-primary !important;
+  background-color: $bg-secondary !important;
+  &:hover{
+    border: $border-hover !important;
+  }
+  &:focus{
+    box-shadow: $boxshadow !important;
+  }
+  .p-button-icon{
+    color: $text-secondary;
+  }
 }
 </style>
 
