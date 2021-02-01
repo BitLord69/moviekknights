@@ -13,6 +13,7 @@ $bg-secondary: #393e46;
 //Border styling
 $border-primary: 1px solid darken($text-primary, 60%);
 $border-radius: 5px;
+$border-hover:  1px solid $text-secondary;
 
 //Boxshadow
 $boxshadow: 0px 0px 2px 2px $text-secondary;

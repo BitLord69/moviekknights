@@ -3,22 +3,25 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <Button class="close" @click="$parent.state.showMovieInfo = false">
-              <span aria-hidden="true">&times;</span>
-            </Button>
+            <Button>Skapa event</Button>
+            <Button icon="pi pi-times" @click="$parent.state.showMovieInfo = false" />
           </div>
-          <div class="modal-body p-4 text-left">
+          <div class="modal-body" :style="{backgroundImage: `url(${movie.backdropPath != null ? movie.backdropPath : '/img/noimagebackdrop.png'})`}">
               <div class="poster">
-                <img :src="movie.posterPath" />
+                <img :src="movie.posterPath != null ? movie.posterPath : '/img/noimage.png'" />
               </div>
               <div class="info">
-                <span><strong>{{movie.title}} ({{movie.releaseDate.slice(0, 4)}})</strong></span>
-                <span>{{movie.originalTitle}}</span>
+                <h3 class="p-m-0">{{movie.title}} ({{movie.releaseDate.slice(0, 4)}})</h3>
+                <span v-if="movie.title.toLowerCase() != movie.originalTitle.toLowerCase()"><em>{{movie.originalTitle}}</em></span>
                 <hr style="" />
                 <span>Speltid: {{time()}}</span>
+                <span>Genre(s): {{movie.genres.map(g => g.name ).join(', ')}}</span>
+                <span>Regisserad av: {{movie.directors.map(d => d.name ).join(', ')}}</span>
+                <span>Kompositör(er): {{movie.composers.map(c => c.name ).join(', ')}}</span>
+                <span>Skådespelare: {{displayCast()}}</span>
               </div>
-              <div class="overview">{{movie.overview}}</div>
-              <div class="cast">CAST</div>
+              <div class="overview">{{state.overview}} <span class="showMoreText" @click="toggleShowText()">{{state.showMoreText}}</span></div>
+              <!--<div class="cast">CAST</div>-->
           </div>
         </div>
       </div>
@@ -26,10 +29,28 @@
 </template>
 
 <script>
+import { reactive } from 'vue';
 export default {
   name: 'MovieInfoModal',
   props: {movie: Object, showMovieInfo: Boolean},
   setup(props){
+    const state = reactive({
+      showMore: false,
+      showMoreText: "[läs mer...]",
+      overview: props.movie && props.movie.overview.slice(0, 150) + "..."
+    })
+
+    function toggleShowText() {
+      state.showMore = !state.showMore
+      state.showMoreText = state.showMore ? "[läs mindre...]" : "[läs mer...]"
+      state.overview = state.showMore ?props.movie && props.movie.overview : props.movie && props.movie.overview.slice(0, 150) + "..."
+    }
+    
+
+    function displayCast() {
+      let cast = props.movie.cast
+      return cast.sort((a, b) => a.order - b.order).slice(0, 5).map(c => c.person.name ).join(', ')
+    }
 
     function time() {
       if(props.movie.runTime % 60 == 0) {
@@ -45,7 +66,7 @@ export default {
       }
     }
     
-    return {time}
+    return { state, time, displayCast, toggleShowText }
   }
 }
 </script>
@@ -62,7 +83,7 @@ export default {
 }
 
 .modal-dialog {
-  width: 80%;
+  width: 40%;
   margin: 1.75rem auto;
 }
 
@@ -86,17 +107,34 @@ export default {
 .modal-body {
   display: grid;
   grid-template-columns: 225px auto;
-  grid-template-rows: auto auto auto;
+  grid-template-rows: 315px auto auto;
   grid-template-areas:
     "poster info"
     "overview overview"
     "cast cast";
   padding: 2%;
   text-align: left;
+  position: relative;
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+.modal-body::before {
+    content: "";
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    background-color: $bg-secondary;
+    opacity: 0.9;
 }
 
 .poster {
       grid-area: poster;
+      z-index: 1;
       img {
         width: 210px;
         height:300px;
@@ -106,19 +144,28 @@ export default {
     }
     .info {
       grid-area: info;
+      z-index: 1;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
     .overview {
       grid-area: overview;
+      z-index: 1;
     }
     .cast {
       grid-area: cast;
+      z-index: 1;
     }
 
 hr {
   width: 100%;
-  border-color: $bg-secondary;
+  border-color: $text-secondary;
+}
+
+.showMoreText {
+  cursor: pointer;
+  color: $text-secondary;
 }
 
 </style>

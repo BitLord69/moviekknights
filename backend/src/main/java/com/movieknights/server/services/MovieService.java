@@ -25,7 +25,7 @@ public class MovieService {
     public List<Movie> getAllMovies() {
         int countFor404 = 0;
         List<Movie> movies = new ArrayList<>();
-        for(int i = 1; i <= 5000; i++) {
+        for(int i = 7500; i <= 8000; i++) {
             try {
                 movies.add(getMovieById(i));
             }
@@ -120,7 +120,7 @@ public class MovieService {
         HashSet<Person> directors = new HashSet<>(getCrewByMovieId(creditsMap, "Director"));
         HashSet<HasActor> cast = new HashSet<>(getCastByMovieId(creditsMap));
         HashSet<Person> composers = new HashSet<>(getCrewByMovieId(creditsMap, "Original Music Composer"));
-        Date releaseDate = new Date();
+        Date releaseDate = null;
         String posterPath = null;
         String backdropPath = null;
 
