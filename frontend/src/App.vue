@@ -24,12 +24,15 @@ body {
   background-color: $bg-primary;
   font-size: 16px;
   overflow-x: hidden;
+  width: 100vw;
+  height: 98vh;
 }
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: $text-primary;
+  height:100%;
   font-family: "Sarala", sans-serif;
 }
 
