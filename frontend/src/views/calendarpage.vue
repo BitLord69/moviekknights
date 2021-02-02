@@ -1,7 +1,9 @@
 <template>
   <div>
     <Button @click="getCalendar" label="Get calendar"></Button>
+    <div v-if="state.events.length > 0">
     <FullCalendar :events="state.events" :options="state.options"/>
+    </div>
     <pre>
       {{state.events}}
       <hr/>
@@ -33,7 +35,7 @@ export default {
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
-                editable: false
+                editable: true
             },
     })
     const events = [
@@ -78,13 +80,13 @@ export default {
       Object.entries(result.value.calendars).forEach( calendar => {
         calendar[1].busy.forEach( event => {
           console.log(event)
-        let start = new Date(event.start.value).toISOString()
-        let end = new Date(event.end.value).toISOString()
+        let start = new Date(event.start.value).toLocaleString()
+        let end = new Date(event.end.value).toLocaleString()
           state.events.push({ 
             "id": index++, 
             "title": "Busy", 
-            "start": start.substring(0, start.length - 5), 
-            "end": end.substring(0, end.length - 5)
+            "start": start,//.substring(0, start.length - 5), 
+            "end": end//.substring(0, end.length - 5)
           })
         })
       });
@@ -92,7 +94,7 @@ export default {
       console.log("Primevue events: ", events);
     }
 
-    return { state, result, getCalendar, events};
+    return { state, result, getCalendar, events };
   },
 };
 </script>
