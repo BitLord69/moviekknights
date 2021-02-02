@@ -120,7 +120,7 @@ public class MovieService {
         HashSet<Person> directors = new HashSet<>(getCrewByMovieId(creditsMap, "Director"));
         HashSet<HasActor> cast = new HashSet<>(getCastByMovieId(creditsMap));
         HashSet<Person> composers = new HashSet<>(getCrewByMovieId(creditsMap, "Original Music Composer"));
-        Date releaseDate = new Date();
+        Date releaseDate = null;
         String posterPath = null;
         String backdropPath = null;
 
