@@ -108,20 +108,6 @@ public class CalendarController {
       e.printStackTrace();
       return new ResponseEntity("Error!!!!!!!! " + e, HttpStatus.BAD_REQUEST);
     }
-    System.out.println("freeBusyQ: " + res.toString());
     return ResponseEntity.ok(res);
-
-//    HttpHeaders headers = new HttpHeaders();
-//    headers.add(HttpHeaders.AUTHORIZATION, CLIENT_ID);
-//    headers.set("API_KEY", API_KEY);
-//    headers.set("Authorization", "Bearer " + CLIENT_ID);
-
-//    HttpEntity<FreeBusyRequest> request = new HttpEntity<>(freeBusyRequest);
-//
-//    FreeBusyResponse res = restTemplate.postForObject("https://www.googleapis.com/calendar/v3/freeBusy?key=" + API_KEY, request, FreeBusyResponse.class);
-//    if(res == null) {
-//      return null;
-//    }
-//      System.out.println("res: " + res);
   }
 }
