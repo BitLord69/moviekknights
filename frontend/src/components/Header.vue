@@ -4,10 +4,11 @@
     <router-link to="/movies">Movies</router-link> |
     <router-link to="/about">About</router-link> |
     <span v-if="isLoggedIn">
-      <router-link to="/logmeout"> Log out </router-link>
+      <router-link to="/calendar">Calendar</router-link> |
+      <router-link to="/logmeout">Log out</router-link>
       </span>
       <span v-else>
-      <router-link to="/logmein"> Log in </router-link>
+      <router-link to="/logmein">Log in</router-link>
       </span>
   </div>
 </template>

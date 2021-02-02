@@ -25,7 +25,7 @@ public class MovieService {
     public List<Movie> getAllMovies() {
         int countFor404 = 0;
         List<Movie> movies = new ArrayList<>();
-        for(int i = 7500; i <= 8000; i++) {
+        for(int i = 1; i <= 500; i++) {
             try {
                 movies.add(getMovieById(i));
             }
