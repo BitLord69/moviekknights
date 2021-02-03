@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import reactor.core.CoreSubscriber;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,14 +30,16 @@ public class MovieService {
     @Autowired
     private MovieRepo movieRepo;
 
-    @Autowired
-    private PersonRepo personRepo;
-
-
-    public List<Movie> getAllMovies() {
+    public Flux<List<Movie>> getAllMovies() {
         int countFor404 = 0;
         List<Movie> movies = new ArrayList<>();
-        for(int i = 20002; i <= 20002; i++) {
+        Mono<List<Movie>> returnList = new Mono<List<Movie>>() {
+            @Override
+            public void subscribe(CoreSubscriber<? super List<Movie>> coreSubscriber) {
+                movies.add()
+            }
+        }
+        for(int i = 6000; i <= 6100; i++) {
             try {
                 movies.add(getMovieById(i));
                 System.out.println("ID " + i + " skapad!");
@@ -49,12 +54,15 @@ public class MovieService {
         return movies;
     }
 
-    public Movie getMovieById(long id) {
+    public Mono<Movie> getMovieById(long id) {
         //Optional<Movie> optional = movieRepo.findMovieByMovieId((long) id);
-        Optional<Movie> optional = movieRepo.findById(id);
-        if(optional.isPresent()) {
-            return optional.get();
+        Mono<Movie> optional = movieRepo.findById(id);
+        if (optional != null) {
+            return optional;
         }
+//        if(optional.isPresent()) {
+//            return optional.get();
+//        }
 
         Map<String, Object> movieMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/"
                 + id + "?api_key=" + TMDB_KEY + "&language=sv&append_to_response=credits", Map.class);
@@ -67,9 +75,7 @@ public class MovieService {
 
         Movie movie = createMovie(movieMap, creditsMap, id);
 
-        movieRepo.save(movie);
-
-        return movie;
+        return (Mono<Movie>) movieRepo.save(movie).subscribe();
     }
 
     public List<Genre> getGenresForMovie(List<LinkedHashMap> genresFromMovie, long id) {

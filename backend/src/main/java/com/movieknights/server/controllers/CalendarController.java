@@ -48,8 +48,6 @@ public class CalendarController {
   @Value("${api.google.client_id}")
   private String GOOGLE_ID;
 
-
-
   @Autowired
   private UserRepo userRepo;
 

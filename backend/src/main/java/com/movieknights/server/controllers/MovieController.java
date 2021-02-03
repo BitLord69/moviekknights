@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -18,15 +20,13 @@ public class MovieController {
     private MovieService movieService;
 
     @GetMapping("/")
-    public List<Movie> getAll() {
-        List<Movie> allMovies = movieService.getAllMovies();
-        return allMovies;
+    public Flux<List<Movie>> getAll() {
+        return movieService.getAllMovies();
     }
 
     @GetMapping("/{id}")
-    public Movie getMovieById(@PathVariable long id) {
-        Movie movie = movieService.getMovieById(id);
-        return movie;
+    public Mono<Movie> getMovieById(@PathVariable long id) {
+        return movieService.getMovieById(id);
     }
 
     @GetMapping("/count")
