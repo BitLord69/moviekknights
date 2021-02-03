@@ -31,6 +31,7 @@ public class DBSetup {
     private final String PATH = "src/dbfiles/";
     private LastLineDTO lineDTO;
     private long numberOfLines = 0;
+    private Path inputFile = null;
 
     @Autowired
     private DBSettingRepo dbSettingRepo;
@@ -38,6 +39,10 @@ public class DBSetup {
     @PostConstruct
     public void run() {
         checkDB();
+
+       /* DBUpdate dbUpdate = new DBUpdate(inputFile);
+        Thread thread = new Thread(dbUpdate);
+        thread.start();*/
     }
 
     private void checkDB() {
@@ -88,6 +93,7 @@ public class DBSetup {
     private void unZipFile(String filePath){
         Path path = Paths.get(filePath);
         Path target = Paths.get(filePath.substring(0, filePath.length() - 3));
+        inputFile = target;
         GZIPInputStream gzipInputStream = null;
         try {
             gzipInputStream = new GZIPInputStream(new FileInputStream(path.toFile()));
