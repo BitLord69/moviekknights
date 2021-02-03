@@ -10,6 +10,7 @@ backend/!**/src/test/**/target/
 
 ### IntelliJ IDEA ###
 backend/.idea
+backend/src/dbfiles/*
 backend/*.iws
 backend/*.iml
 backend/*.ipr
