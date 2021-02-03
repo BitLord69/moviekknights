@@ -5,7 +5,9 @@ import com.movieknights.server.entities.Movie;
 import com.movieknights.server.entities.Person;
 import com.movieknights.server.relationships.HasActor;
 import com.movieknights.server.repos.MovieRepo;
+import com.movieknights.server.repos.PersonRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -19,15 +21,23 @@ import java.util.stream.Collectors;
 public class MovieService {
     private final RestTemplate restTemplate = new RestTemplate();
 
+    @Value("${tmdb_key}")
+    private String TMDB_KEY;
+
     @Autowired
     private MovieRepo movieRepo;
+
+    @Autowired
+    private PersonRepo personRepo;
+
 
     public List<Movie> getAllMovies() {
         int countFor404 = 0;
         List<Movie> movies = new ArrayList<>();
-        for(int i = 6000; i <= 6100; i++) {
+        for(int i = 20002; i <= 20002; i++) {
             try {
                 movies.add(getMovieById(i));
+                System.out.println("ID " + i + " skapad!");
             }
             catch (Exception e) {
                 countFor404++;
@@ -46,14 +56,13 @@ public class MovieService {
             return optional.get();
         }
 
-        Map<String, Object> movieMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + id
-            + "?api_key=7641e2c988f78099d675e3e5a90a9a56&language=sv&append_to_response=credits", Map.class);
+        Map<String, Object> movieMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/"
+                + id + "?api_key=" + TMDB_KEY + "&language=sv&append_to_response=credits", Map.class);
         if(movieMap == null) {
             return null;
         }
 
         LinkedHashMap<String, Object> creditsMap = (LinkedHashMap<String, Object>) movieMap.get("credits");
-//        Map<String, Object> creditsMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + id + "/credits?api_key=7641e2c988f78099d675e3e5a90a9a56", Map.class);
         if(creditsMap == null) return null;
 
         Movie movie = createMovie(movieMap, creditsMap, id);
@@ -79,14 +88,18 @@ public class MovieService {
         List<Person> credits = ((List<Map<String, Object>>) castMap.get("cast"))
                 .stream()
                 .map(p -> {
-                        Map<String, Object> personMap = restTemplate.getForObject("https://api.themoviedb.org/3/person/" + p.get("id") + "?api_key=7641e2c988f78099d675e3e5a90a9a56", Map.class);
-                        if(personMap == null) return null;
+                    long id = (int) p.get("id");
+                    Optional<Person> optional = personRepo.findById(id);
+                    if(optional.isPresent()) {
+                        cast.add(new HasActor(optional.get(), (String) p.get("character"), (int) p.get("order")));
+                        return optional.get();
+                    }
 
-                        Person person = createPerson(p, personMap);
+                    Person person = createPerson(p);
 
-                        cast.add(new HasActor(person, (String) p.get("character"), (int) p.get("order")));
+                    cast.add(new HasActor(person, (String) p.get("character"), (int) p.get("order")));
 
-                        return person;
+                    return person;
                 })
                 .filter(p ->  p != null )
                 .collect(Collectors.toList());
@@ -102,10 +115,13 @@ public class MovieService {
                     if(!p.get("job").equals(typeOfJob)) {
                         return null;
                     } else {
-                        Map<String, Object> personMap = restTemplate.getForObject("https://api.themoviedb.org/3/person/" + p.get("id") + "?api_key=7641e2c988f78099d675e3e5a90a9a56", Map.class);
-                        if(personMap == null) return null;
+                        long id = (int) p.get("id");
+                        Optional<Person> optional = personRepo.findById(id);
+                        if(optional.isPresent()) {
+                            return optional.get();
+                        }
 
-                        Person person = createPerson(p, personMap);
+                        Person person = createPerson(p);
 
                         return person;
                     }
@@ -162,7 +178,11 @@ public class MovieService {
         return movie;
     }
 
-    private Person createPerson(Map<String, Object> p, Map<String, Object> personMap) {
+    private Person createPerson(Map<String, Object> p) {
+        Map<String, Object> personMap = restTemplate.getForObject("https://api.themoviedb.org/3/person/"
+                + p.get("id") + "?api_key=" + TMDB_KEY, Map.class);
+        if(personMap == null) return null;
+
         Date dob = null;
         Date dod = null;
         String profilePath = null;
