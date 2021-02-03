@@ -28,6 +28,7 @@ public class DBSetup {
 
     private final String fileUrlStart = "http://files.tmdb.org/p/exports/movie_ids_";
     private final String fileUrlEnd = ".json.gz";
+    private final String PATH = "src/dbfiles/";
     private LastLineDTO lineDTO;
     private long numberOfLines = 0;
 
@@ -73,23 +74,42 @@ public class DBSetup {
         String fileUrlDate = newMonth + "_" + newDay + "_" + year;
         InputStream in = null;
         try {
+            Path p = Paths.get(PATH);
+            Files.createDirectories(p);
+
             in = new URL(fileUrlStart + fileUrlDate + fileUrlEnd).openStream();
-            Files.copy(in, Paths.get("src/dbfiles", fileUrlDate + fileUrlEnd), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(in, Paths.get(PATH, fileUrlDate + fileUrlEnd), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
         }
         unZipFile("src/dbfiles/" + fileUrlDate + fileUrlEnd);
     }
 
-    private void unZipFile(String filePath) {
+    private void unZipFile(String filePath){
         Path path = Paths.get(filePath);
         Path target = Paths.get(filePath.substring(0, filePath.length() - 3));
+        GZIPInputStream gzipInputStream = null;
         try {
-            GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(path.toFile()));
+            gzipInputStream = new GZIPInputStream(new FileInputStream(path.toFile()));
             Files.copy(gzipInputStream, target, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                assert gzipInputStream != null;
+                gzipInputStream.close();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
         }
+
+        //Deletes .gz file after unzipping it.
+        try{
+            Files.delete(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         countLinesInFile(target);
     }
 
