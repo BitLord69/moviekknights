@@ -54,6 +54,7 @@ h3 {
 
 .p-paginator{
   background-color: $bg-secondary !important;
+  font-family: "Sarala", sans-serif !important;
 }
 .p-button{
   color: $text-secondary !important;
