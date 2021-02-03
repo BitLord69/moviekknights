@@ -39,6 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
         .authorizeRequests()
         .antMatchers("/rest/calendar/freebusy").authenticated()
+        .antMatchers("/rest/date").permitAll()
         .antMatchers("/api/auth/whoami").permitAll()
         .antMatchers("/api/auth/storeauthcode").permitAll()
         .antMatchers( "/").permitAll()
