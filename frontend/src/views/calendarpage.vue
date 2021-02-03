@@ -1,8 +1,10 @@
 <template>
   <div>
     <Button @click="getCalendar" label="Get calendar"></Button>
-    <div v-if="state.events.length > 0">
-    <FullCalendar :events="state.events" :options="state.options"/>
+    <div class="calendar-container">
+      <div class="calendar" v-if="events.length > 0">
+        <FullCalendar :events="events" :options="state.options"/>
+      </div>
     </div>
   </div>
 </template>
@@ -14,14 +16,14 @@ import FullCalendar from 'primevue/fullcalendar';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-
+import EventHelper from "@/_helpers/EventHelper"
 
 export default {
   components: { FullCalendar },
   setup() {
+    const { events } = EventHelper();
     const result = ref(null);
     let state = reactive({
-      events: [],
       options: {
                 plugins:[dayGridPlugin, timeGridPlugin, interactionPlugin],
                 initialDate: '2021-02-01',
@@ -30,7 +32,11 @@ export default {
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
-                editable: true
+                editable: true,
+                handleWindowResize: true,
+                contentHeight: 'auto',
+                height: 'auto',
+                eventOverlap: false,
             },
     })
 
@@ -41,7 +47,7 @@ export default {
         calendar[1].busy.forEach( event => {
         let start = new Date(event.start.value).toLocaleString()
         let end = new Date(event.end.value).toLocaleString()
-          state.events.push({ 
+          events.push({ 
             "id": index++, 
             "title": "Busy", 
             "start": start,
@@ -51,9 +57,20 @@ export default {
       });
     }
 
-    return { state, result, getCalendar };
+    return { state, result, events, getCalendar };
   },
 };
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+
+.calendar-container {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  justify-content: center;
+  .calendar {
+    display: grid;
+    grid-column: 3/11;
+  }
+}
+</style>
