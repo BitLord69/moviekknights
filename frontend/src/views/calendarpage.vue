@@ -1,20 +1,59 @@
 <template>
-    <iframe :src="'https://calendar.google.com/calendar/embed?src=' + email + '&ctz=Europe%2FStockholm'" style="border: 0" width="90%" height="90%" frameborder="0" scrolling="no"></iframe>
+  <div>
+    <Button @click="getCalendar" label="Get calendar"></Button>
+    <div v-if="state.events.length > 0">
+    <FullCalendar :events="state.events" :options="state.options"/>
+    </div>
+  </div>
 </template>
 
 <script>
-//import UserHandler from '@/modules/UserHandler';
-export default {
-    name: "Calendar",
-    setup() {
-        //const {currentUser} = UserHandler();
-        let email = JSON.parse(window.localStorage.getItem("user")).username.replace("@", "%40");
+import { extFetch } from "@/modules/extFetch";
+import { ref, reactive } from "vue";
+import FullCalendar from 'primevue/fullcalendar';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
 
-        return {email}
+
+export default {
+  components: { FullCalendar },
+  setup() {
+    const result = ref(null);
+    let state = reactive({
+      events: [],
+      options: {
+                plugins:[dayGridPlugin, timeGridPlugin, interactionPlugin],
+                initialDate: '2021-02-01',
+                headerToolbar: {
+                    left: 'prev,next',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                editable: true
+            },
+    })
+
+    async function getCalendar() {
+      result.value = await extFetch("/rest/calendar/freebusy", "GET", undefined, true);
+      let index = 1;
+      Object.entries(result.value.calendars).forEach( calendar => {
+        calendar[1].busy.forEach( event => {
+        let start = new Date(event.start.value).toLocaleString()
+        let end = new Date(event.end.value).toLocaleString()
+          state.events.push({ 
+            "id": index++, 
+            "title": "Busy", 
+            "start": start,
+            "end": end
+          })
+        })
+      });
     }
 
-}
+    return { state, result, getCalendar };
+  },
+};
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style></style>

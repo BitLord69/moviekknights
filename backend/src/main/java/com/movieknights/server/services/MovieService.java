@@ -41,7 +41,6 @@ public class MovieService {
                 System.out.println("Antal 404: " + countFor404);
             }
         }
-
         return movies;
     }
 
@@ -60,7 +59,7 @@ public class MovieService {
         LinkedHashMap<String, Object> creditsMap = (LinkedHashMap<String, Object>) movieMap.get("credits");
 
 //        Map<String, Object> creditsMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/" + id + "/credits?api_key=7641e2c988f78099d675e3e5a90a9a56", Map.class);
-//        if(creditsMap == null) return null;
+        if(creditsMap == null) return null;
 
         Movie movie = createMovie(movieMap, creditsMap, id);
 
