@@ -34,7 +34,7 @@ public class MovieService {
     public List<Movie> getAllMovies() {
         int countFor404 = 0;
         List<Movie> movies = new ArrayList<>();
-        for(int i = 1; i <= 22000; i++) {
+        for(int i = 22001; i <= 23000; i++) {
             try {
                 movies.add(getMovieById(i));
                 System.out.println("ID " + i + " skapad!");
