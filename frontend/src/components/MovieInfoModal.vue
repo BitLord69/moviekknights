@@ -3,7 +3,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <Button @click="createEvent(movie)">Skapa event</Button>
+          <Button @click="addEventToCalendar(movie)">Skapa event</Button>
           <Button icon="pi pi-times" @click="$parent.state.showMovieInfo = false" />
         </div>
         <div class="modal-body" :style="{backgroundImage: `url(${movie.backdropPath != null ? movie.backdropPath : '/img/noimagebackdrop.png'})`}">
@@ -56,7 +56,7 @@ export default {
   name: 'MovieInfoModal',
   props: {movie: Object, showMovieInfo: Boolean},
   setup(props){
-    const { createEvent } = EventHelper();
+    const { addEventToCalendar } = EventHelper();
     const state = reactive({
       showMore: false,
       showMoreText: "[läs mer...]",
@@ -95,7 +95,7 @@ export default {
       }
     }
     
-    return { state, time, displayCast, toggleShowText, displayCastTest, createEvent }
+    return { state, time, displayCast, toggleShowText, displayCastTest, addEventToCalendar }
   }
 }
 </script>

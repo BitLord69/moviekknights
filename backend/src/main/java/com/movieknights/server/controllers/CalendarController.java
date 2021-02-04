@@ -7,9 +7,8 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.model.FreeBusyRequest;
-import com.google.api.services.calendar.model.FreeBusyRequestItem;
-import com.google.api.services.calendar.model.FreeBusyResponse;
+import com.google.api.services.calendar.model.*;
+import com.movieknights.server.entities.EventDTO;
 import com.movieknights.server.entities.User;
 import com.movieknights.server.repos.UserRepo;
 import com.movieknights.server.services.UserDetailsImpl;
@@ -19,9 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -29,6 +26,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("rest/calendar")
@@ -46,7 +44,6 @@ public class CalendarController {
   private String GOOGLE_ID;
 
 
-
   @Autowired
   private UserRepo userRepo;
 
@@ -56,7 +53,7 @@ public class CalendarController {
   @GetMapping("/freebusy")
   public ResponseEntity getFreeBusy() {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
-    UserDetailsImpl userDetails = (UserDetailsImpl)authentication.getPrincipal();
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
     User user = userRepo.findById(userDetails.getUsername()).get();
 
     List<User> users = userRepo.findAll();
@@ -65,10 +62,10 @@ public class CalendarController {
     GoogleCredential credentials = null;
     try {
       credentials = new GoogleCredential.Builder().setTransport(GoogleNetHttpTransport.newTrustedTransport())
-        .setJsonFactory(JacksonFactory.getDefaultInstance())
-        .setClientSecrets(GOOGLE_ID, GOOGLE_SECRET)
+              .setJsonFactory(JacksonFactory.getDefaultInstance())
+              .setClientSecrets(GOOGLE_ID, GOOGLE_SECRET)
 
-        .build();
+              .build();
     } catch (GeneralSecurityException e) {
       e.printStackTrace();
     } catch (IOException e) {
@@ -83,13 +80,13 @@ public class CalendarController {
             .setApplicationName("Movie Nights")
             .build();
 
-     Calendar.Freebusy freebusy = calendar.freebusy();
-     FreeBusyRequest freeBusyRequest = new FreeBusyRequest();
-     List<FreeBusyRequestItem> items = new ArrayList<>();
-     users.forEach(u -> {
-       FreeBusyRequestItem freeBusyRequestItem = new FreeBusyRequestItem();
-       items.add(freeBusyRequestItem.setId(u.getUsername()));
-     });
+    Calendar.Freebusy freebusy = calendar.freebusy();
+    FreeBusyRequest freeBusyRequest = new FreeBusyRequest();
+    List<FreeBusyRequestItem> items = new ArrayList<>();
+    users.forEach(u -> {
+      FreeBusyRequestItem freeBusyRequestItem = new FreeBusyRequestItem();
+      items.add(freeBusyRequestItem.setId(u.getUsername()));
+    });
 
     freeBusyRequest.setTimeMin(dateMin);
     freeBusyRequest.setTimeMax(dateMax);
@@ -99,12 +96,60 @@ public class CalendarController {
     FreeBusyResponse res = null;
     try {
       res = freebusy.query(freeBusyRequest)
-          .setKey(API_KEY)
-          .execute();
+              .setKey(API_KEY)
+              .execute();
     } catch (IOException e) {
       e.printStackTrace();
       return new ResponseEntity("Error!!!!!!!! " + e, HttpStatus.BAD_REQUEST);
     }
     return ResponseEntity.ok(res);
   }
+
+  @PostMapping("/add")
+  public ResponseEntity addEvent(@RequestBody EventDTO eventDTO) {
+    List<User> users = userRepo.findAll();
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+
+    GoogleCredential credentials = null;
+    try {
+      credentials = new GoogleCredential.Builder().setTransport(GoogleNetHttpTransport.newTrustedTransport())
+              .setJsonFactory(JacksonFactory.getDefaultInstance())
+              .setClientSecrets(GOOGLE_ID, GOOGLE_SECRET)
+
+              .build();
+    } catch (GeneralSecurityException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    Calendar calendar = new Calendar.Builder(
+            new NetHttpTransport(),
+            JacksonFactory.getDefaultInstance(),
+            credentials)
+            .setApplicationName("Movie Nights")
+            .build();
+
+    EventDateTime start = new EventDateTime();
+    EventDateTime end = new EventDateTime();
+    start.setDate(eventDTO.getStart());
+    end.setDate(eventDTO.getEnd());
+    Event event = new Event().setSummary(eventDTO.getTitle()).setStart(start).setEnd(end);
+    List<EventAttendee> attendees = new ArrayList<>();
+
+    for (User u : users) {
+      if (!u.getUsername().equals(username)) {
+        attendees.add(new EventAttendee().setEmail(u.getUsername()));
+      }
+    }
+    event.setAttendees(attendees);
+    try {
+      calendar.events().insert(username, event).execute();
+    } catch (IOException e) {
+      return new ResponseEntity("Error!!!!!!!! " + e, HttpStatus.BAD_REQUEST);
+    }
+    return ResponseEntity.ok("SUCCESS!!!" + event);
+  }
 }
+

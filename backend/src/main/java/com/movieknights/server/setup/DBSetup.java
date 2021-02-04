@@ -64,18 +64,9 @@ public class DBSetup {
         int month = localDate.getMonthValue();
         int day = localDate.getDayOfMonth();
 
-        if (month < 10) {
-            newMonth = "0" + month;
-        }
-        else {
-            newMonth = "" + month;
-        }
-        if (day < 10) {
-            newDay = "0" + day;
-        }
-        else {
-            newDay = "" + day;
-        }
+        newMonth = month < 10 ? "0" + month : "" + month;
+        newDay = day < 10 ? "0" + day : "" + day;
+
         String fileUrlDate = newMonth + "_" + newDay + "_" + year;
         InputStream in = null;
         try {
