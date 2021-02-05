@@ -34,7 +34,7 @@ public class MovieService {
     public List<Movie> getAllMovies() {
         int countFor404 = 0;
         List<Movie> movies = new ArrayList<>();
-        for(int i = 1; i <= 22000; i++) {
+        for(int i = 20002; i <= 20002; i++) {
             try {
                 movies.add(getMovieById(i));
                 System.out.println("ID " + i + " skapad!");
@@ -142,9 +142,7 @@ public class MovieService {
         String backdropPath = null;
 
         try{
-            SimpleDateFormat simpleReleaseDate = new SimpleDateFormat("yyyy-MM-dd");
-            simpleReleaseDate.setTimeZone(TimeZone.getTimeZone("UTC"));
-            releaseDate = simpleReleaseDate.parse((String) movieMap.get("release_date"));
+            releaseDate = new SimpleDateFormat("yyyy-MM-dd").parse((String) movieMap.get("release_date"));
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -182,23 +180,15 @@ public class MovieService {
 
     private Person createPerson(Map<String, Object> p) {
         Map<String, Object> personMap = restTemplate.getForObject("https://api.themoviedb.org/3/person/"
-                + p.get("id") + "?api_key=" + TMDB_KEY + "&language=sv", Map.class);
+                + p.get("id") + "?api_key=" + TMDB_KEY, Map.class);
         if(personMap == null) return null;
 
         Date dob = null;
         Date dod = null;
         String profilePath = null;
         try {
-            if (personMap.get("birthday") != null) {
-                SimpleDateFormat simpleDob = new SimpleDateFormat("yyyy-MM-dd");
-                simpleDob.setTimeZone(TimeZone.getTimeZone("UTC"));
-                dob = simpleDob.parse((String) personMap.get("birthday"));
-            }
-            if (personMap.get("deathday") != null) {
-                SimpleDateFormat simpleDod = new SimpleDateFormat("yyyy-MM-dd");
-                simpleDod.setTimeZone(TimeZone.getTimeZone("UTC"));
-                dod = simpleDod.parse((String) personMap.get("deathday"));
-            }
+            if (personMap.get("birthday") != null) dob = new SimpleDateFormat("yyyy-MM-dd").parse((String) personMap.get("birthday"));
+            else if (personMap.get("deathday") != null) dod = new SimpleDateFormat("yyyy-MM-dd").parse((String) personMap.get("deathday"));
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -227,6 +217,6 @@ public class MovieService {
     }
 
     public List<Movie> getMoviesFromDb() {
-        return movieRepo.findAll(Sort.by(Sort.Direction.DESC, "movieId"));
+        return movieRepo.findAll(Sort.by(Sort.Direction.DESC, "popularity"));
     }
 }
