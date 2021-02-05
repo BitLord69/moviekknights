@@ -26,7 +26,6 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("rest/calendar")
@@ -42,7 +41,6 @@ public class CalendarController {
 
   @Value("${api.google.client_id}")
   private String GOOGLE_ID;
-
 
   @Autowired
   private UserRepo userRepo;
@@ -66,9 +64,7 @@ public class CalendarController {
               .setClientSecrets(GOOGLE_ID, GOOGLE_SECRET)
 
               .build();
-    } catch (GeneralSecurityException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
+    } catch (GeneralSecurityException | IOException e) {
       e.printStackTrace();
     }
     //new GoogleCredential().setAccessToken(user.getGoogleAccessToken());
@@ -110,17 +106,16 @@ public class CalendarController {
     List<User> users = userRepo.findAll();
     var authentication = SecurityContextHolder.getContext().getAuthentication();
     String username = authentication.getName();
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+    User user = userRepo.findById(userDetails.getUsername()).get();
 
     GoogleCredential credentials = null;
     try {
       credentials = new GoogleCredential.Builder().setTransport(GoogleNetHttpTransport.newTrustedTransport())
               .setJsonFactory(JacksonFactory.getDefaultInstance())
               .setClientSecrets(GOOGLE_ID, GOOGLE_SECRET)
-
               .build();
-    } catch (GeneralSecurityException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
+    } catch (GeneralSecurityException | IOException e) {
       e.printStackTrace();
     }
 
@@ -133,8 +128,8 @@ public class CalendarController {
 
     EventDateTime start = new EventDateTime();
     EventDateTime end = new EventDateTime();
-    start.setDate(eventDTO.getStart());
-    end.setDate(eventDTO.getEnd());
+    start.setDateTime(eventDTO.getStart());
+    end.setDateTime(eventDTO.getEnd());
     Event event = new Event().setSummary(eventDTO.getTitle()).setStart(start).setEnd(end);
     List<EventAttendee> attendees = new ArrayList<>();
 
@@ -145,7 +140,7 @@ public class CalendarController {
     }
     event.setAttendees(attendees);
     try {
-      calendar.events().insert(username, event).execute();
+      event = calendar.events().insert(user.getUsername(), event).setOauthToken(user.getGoogleAccessToken()).setKey(API_KEY).execute();
     } catch (IOException e) {
       return new ResponseEntity("Error!!!!!!!! " + e, HttpStatus.BAD_REQUEST);
     }
