@@ -6,10 +6,11 @@
       template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
       currentPageReportTemplate="({currentPage} av {totalPages})">
       <template #left>
-        <Button type="button" icon="pi pi-refresh" @click="reset()"/>
+        &nbsp;
+        <!-- <Button type="button" icon="pi pi-refresh" @click="reset()"/> -->
       </template>
       <template #right>
-        <Button type="button" icon="pi pi-search"/>
+        <AutoComplete v-model="state.searchTerm" :suggestions="state.filteredMovies" @complete="searchMovie($event)" field="title" />
       </template>
     </Paginator>
     
@@ -17,29 +18,35 @@
         <Movie :movie="movie" v-for="(movie, index) in state.pagMovies && state.pagMovies.slice(state.first, state.first+18)" :key="index" @click="displayMovieInfo(movie)"/>
     </div>
         <MovieInfoModal v-if="state.showMovieInfo" :movie="state.selectedMovie"/>
-    
   </div>
-
-  
 </template>
 
 <script>
-
+import { reactive, onMounted, watchEffect } from 'vue';
 import Movie from "@/components/Movie.vue";
-import MovieInfoModal from "@/components/MovieInfoModal.vue";
+import AutoComplete from 'primevue/autocomplete';
 import MovieHelper from "@/_helpers/MovieHelper";
-import { reactive, onMounted } from 'vue';
+import MovieInfoModal from "@/components/MovieInfoModal.vue";
 
 export default {
   name: "Movies",
-  components: { Movie, MovieInfoModal },
+  components: { Movie, MovieInfoModal, AutoComplete },
   setup(){
     const { getMovies, getMovieCount, movies, movieCount, movieError } = MovieHelper();
     let state = reactive({
       first: 0,
-      pagMovies: movies,
+      pagMovies: movies.value,
       showMovieInfo: false,
-      selectedMovie: null
+      selectedMovie: null,
+      searchTerm: '',
+      filteredMovies: movies.value,
+    })
+
+    watchEffect(() => {
+      if (typeof state.searchTerm === 'object') {
+        state.selectedMovie = state.searchTerm;
+        state.showMovieInfo = true;
+      }
     })
 
     onMounted(async () => {
@@ -56,12 +63,24 @@ export default {
       state.selectedMovie = movie
     }
 
-    return { state, movies, movieCount, movieError, displayMovieInfo, reset}
+    function searchMovie(event) {
+      if (!event.query.trim().length) {
+        state.filteredMovies = movies.value;
+      }
+      else {
+        state.filteredMovies = movies.value.filter((movie) => {
+            return movie.title.toLowerCase().startsWith(event.query.toLowerCase());
+        });
+      }
+    }
+
+    return { state, movies, movieCount, movieError, displayMovieInfo, reset, searchMovie}
   }
 }
 </script>
 
 <style lang="scss" scope>
+@import "@/styles/_variables.scss";
   .movies {
     display: grid;
     width: 100%;
@@ -84,5 +103,38 @@ export default {
     row-gap: 12px;
     column-gap: 13px;
     justify-content: center;
+  }
+
+  .p-inputtext {
+    background-color: $bg-primary;
+    border: $border-primary !important;
+
+    &:enabled:focus {
+      box-shadow: $boxshadow;
+    }
+
+    &:hover {
+      border: $border-hover !important;
+    }
+  }
+
+  .p-paginator {
+    justify-content: space-between;
+  }
+
+  .p-autocomplete-panel {
+    background-color: $bg-primary;
+  }
+
+  .p-paginator-left-content {
+    width:33%;
+    margin-right: 0 !important;
+  }
+
+  .p-paginator-right-content {
+    width:33%;
+    display: flex;
+    justify-content: flex-end;
+    margin-left: 0 !important;
   }
 </style>
