@@ -14,6 +14,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,9 +34,10 @@ public class MovieService {
 
 
     public List<Movie> getAllMovies() {
+        Instant start = Instant.now();
         int countFor404 = 0;
         List<Movie> movies = new ArrayList<>();
-        for(int i = 1; i <= 22000; i++) {
+        for(int i = 23301; i <= 24000; i++) {
             try {
                 movies.add(getMovieById(i));
                 System.out.println("ID " + i + " skapad!");
@@ -46,6 +49,12 @@ public class MovieService {
                 System.out.println("Antal 404: " + countFor404);
             }
         }
+        Instant end = Instant.now();
+        Duration between = Duration.between(start, end);
+        System.out.println(between.getSeconds());
+
+
+        System.out.println();
         return movies;
     }
 
