@@ -24,9 +24,9 @@
 <script>
 import { reactive, onMounted, watchEffect } from 'vue';
 import Movie from "@/components/Movie.vue";
-import AutoComplete from 'primevue/autocomplete';
-import MovieHelper from "@/_helpers/MovieHelper";
 import MovieInfoModal from "@/components/MovieInfoModal.vue";
+import MovieHelper from "@/modules/MovieHelper";
+import AutoComplete from 'primevue/autocomplete';
 
 export default {
   name: "Movies",
