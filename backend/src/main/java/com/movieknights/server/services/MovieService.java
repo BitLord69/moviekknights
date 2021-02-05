@@ -6,10 +6,13 @@ import com.movieknights.server.entities.Person;
 import com.movieknights.server.relationships.HasActor;
 import com.movieknights.server.repos.MovieRepo;
 import com.movieknights.server.repos.PersonRepo;
+import com.movieknights.server.utils.TextUtil;
+import org.neo4j.driver.exceptions.NoSuchRecordException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
@@ -65,8 +68,16 @@ public class MovieService {
             return optional.get();
         }
 
-        Map<String, Object> movieMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/"
+        Map<String, Object> movieMap = null;
+
+        try {
+            movieMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/"
                 + id + "?api_key=" + TMDB_KEY + "&language=sv&append_to_response=credits", Map.class);
+        } catch (HttpClientErrorException e) {
+            System.out.printf("Error getting movie with id: %s! Error: %s\n", TextUtil.pimpString(id, TextUtil.LEVEL_WARNING), e);
+            return null;
+        }
+
         if(movieMap == null) {
             return null;
         }
@@ -76,7 +87,11 @@ public class MovieService {
 
         Movie movie = createMovie(movieMap, creditsMap, id);
 
-        movieRepo.save(movie);
+        try {
+            movieRepo.save(movie);
+        } catch(Exception e) {
+            System.out.printf("Error when trying to save movie: %s, %s\nerror: %s\n", TextUtil.pimpString(movie.getTitle(), TextUtil.LEVEL_WARNING), movie.getMovieId(), e);
+        }
 
         return movie;
     }
