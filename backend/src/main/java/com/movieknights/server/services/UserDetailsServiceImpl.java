@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @Service
+@Transactional
 public class UserDetailsServiceImpl implements UserDetailsService {
   @Autowired
   UserRepo userRepo;
@@ -19,7 +20,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   public BCryptPasswordEncoder getEncoder() { return encoder; }
 
   @Override
-  @Transactional
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     User user = userRepo.findById(email)
         .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));

@@ -3,6 +3,7 @@ package com.movieknights.server.controllers;
 import com.movieknights.server.services.MovieService;
 import com.movieknights.server.entities.Movie;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +20,7 @@ public class MovieController {
     @Autowired
     private MovieService movieService;
 
-    @GetMapping("/")
+    @GetMapping(value="/", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<List<Movie>> getAll() {
         return movieService.getAllMovies();
     }
@@ -30,12 +31,13 @@ public class MovieController {
     }
 
     @GetMapping("/count")
-    public long getCountOfMoviesInDb() {
+    public Mono<Long> getCountOfMoviesInDb() {
         return movieService.getCount();
     }
 
-    @GetMapping("/db")
-    public List<Movie> getTheMoviesFromDb() {
+    @GetMapping(value="/db", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public
+    Flux<Movie> getTheMoviesFromDb() {
         return movieService.getMoviesFromDb();
     }
 }

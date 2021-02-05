@@ -9,16 +9,14 @@ import com.movieknights.server.entities.User;
 import com.movieknights.server.jwt.JwtResponse;
 import com.movieknights.server.jwt.JwtUtils;
 import com.movieknights.server.repos.UserRepo;
-import com.movieknights.server.services.UserDetailsImpl;
 import com.movieknights.server.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -39,8 +37,8 @@ public class AuthController {
   @Autowired
   private UserRepo userRepo;
 
-  @Autowired
-  AuthenticationManager authenticationManager;
+//  @Autowired
+//  AuthenticationManager authenticationManager;
 
   @Autowired
   JwtUtils jwtUtils;
@@ -53,7 +51,7 @@ public class AuthController {
   public ResponseEntity storeauthcode(@RequestBody String code, @RequestHeader("X-Requested-With") String encoding) {
     if (encoding == null || encoding.isEmpty()) {
       // Without the `X-Requested-With` header, this request could be forged. Aborts.
-      return new ResponseEntity("Error, wrong headers", HttpStatus.BAD_REQUEST);
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     GoogleTokenResponse tokenResponse = null;
@@ -84,13 +82,20 @@ public class AuthController {
 
   @GetMapping("/whoami")
   public ResponseEntity whoAmI() {
-    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    Authentication authentication = ReactiveSecurityContextHolder
+                              .getContext()
+                              .map(context ->
+                                      context.getAuthentication())
+                              .block();
     if (authentication == null) {
       System.out.println("whoami authentication is null");
       return ResponseEntity.ok(new NotLoggedInError());
     }
 
     String username = authentication.getName();
+
+    System.out.println("whoami username is: " + username);
+
     if (username.equals("anonymousUser")) {
       System.out.println("whoami anonymousUser");
       return ResponseEntity.ok(new NotLoggedInError());
@@ -100,18 +105,8 @@ public class AuthController {
 
   private ResponseEntity<JwtResponse> authenticateUser(User user) {
     System.out.println("username: " + user.getUsername() + ", password:" + user.getPassword());
-
-    String password = user.getUsername() + PASSWORD_SALT;
-
-    Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(user.getUsername(), password));
-
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-    String jwt = jwtUtils.generateJwtToken(authentication);
-
-    UserDetailsImpl userDetails = (UserDetailsImpl)authentication.getPrincipal();
-
-    return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getUsername(), user.getGoogleAccessToken(), userDetails.getAuthorities()));
+    String jwt = jwtUtils.generateJwtToken(user.getUsername());
+    return ResponseEntity.ok(new JwtResponse(jwt, user.getUsername(), user.getGoogleAccessToken()));
   }
 
   private User createOrUpdateUser(GoogleTokenResponse tokenResponse) {

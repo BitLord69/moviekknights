@@ -10,13 +10,10 @@ public class JwtResponse {
   private String username;
   private String googleAccessToken;
 
-  private Collection<? extends GrantedAuthority> roles;
-
-  public JwtResponse(String accessToken, String username, String googleAccessToken, Collection<? extends GrantedAuthority> roles) {
+  public JwtResponse(String accessToken, String username, String googleAccessToken) {
     this.token = accessToken;
     this.username = username;
     this.googleAccessToken = googleAccessToken;
-    this.roles = roles;
   }
 
   public String getAccessToken() {
@@ -49,9 +46,5 @@ public class JwtResponse {
 
   public void setGoogleAccessToken(String googleAccessToken) {
     this.googleAccessToken = googleAccessToken;
-  }
-
-  public Collection<? extends GrantedAuthority> getRoles() {
-    return roles;
   }
 }

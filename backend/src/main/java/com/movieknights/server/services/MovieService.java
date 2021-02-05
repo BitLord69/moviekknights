@@ -8,19 +8,21 @@ import com.movieknights.server.repos.MovieRepo;
 import com.movieknights.server.repos.PersonRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@ComponentScan
 public class MovieService {
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -30,19 +32,19 @@ public class MovieService {
     @Autowired
     private MovieRepo movieRepo;
 
+    @Autowired
+    private PersonRepo personRepo;
+
     public Flux<List<Movie>> getAllMovies() {
+        Duration d = Duration.ofMillis(System.currentTimeMillis());
+
         int countFor404 = 0;
         List<Movie> movies = new ArrayList<>();
-        Mono<List<Movie>> returnList = new Mono<List<Movie>>() {
-            @Override
-            public void subscribe(CoreSubscriber<? super List<Movie>> coreSubscriber) {
-                movies.add()
-            }
-        }
         for(int i = 6000; i <= 6100; i++) {
             try {
-                movies.add(getMovieById(i));
-                System.out.println("ID " + i + " skapad!");
+                movies.add(getMovieById(i).block());
+//                getMovieById(i).subscribe(movies::add);
+                System.out.println("ID " + i + " tillagd i resultatlistan!");
             }
             catch (Exception e) {
                 countFor404++;
@@ -51,18 +53,16 @@ public class MovieService {
                 System.out.println("Antal 404: " + countFor404);
             }
         }
-        return movies;
+        return Flux.just(movies);
+//        return Flux.fromIterable(movies);
     }
 
     public Mono<Movie> getMovieById(long id) {
         //Optional<Movie> optional = movieRepo.findMovieByMovieId((long) id);
-        Mono<Movie> optional = movieRepo.findById(id);
-        if (optional != null) {
-            return optional;
+        Movie movieInDb = movieRepo.findById(id).block();
+        if (movieInDb != null) {
+            return Mono.just(movieInDb);
         }
-//        if(optional.isPresent()) {
-//            return optional.get();
-//        }
 
         Map<String, Object> movieMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/"
                 + id + "?api_key=" + TMDB_KEY + "&language=sv&append_to_response=credits", Map.class);
@@ -75,7 +75,9 @@ public class MovieService {
 
         Movie movie = createMovie(movieMap, creditsMap, id);
 
-        return (Mono<Movie>) movieRepo.save(movie).subscribe();
+        System.out.println("Movie created in getMovieById: " + movie);
+
+        return movieRepo.save(movie);
     }
 
     public List<Genre> getGenresForMovie(List<LinkedHashMap> genresFromMovie, long id) {
@@ -109,7 +111,6 @@ public class MovieService {
                 })
                 .filter(p ->  p != null )
                 .collect(Collectors.toList());
-
 
         return cast;
     }
@@ -218,11 +219,11 @@ public class MovieService {
         return person;
     }
 
-    public long getCount() {
+    public Mono<Long> getCount() {
         return movieRepo.count();
     }
 
-    public List<Movie> getMoviesFromDb() {
+    public Flux<Movie> getMoviesFromDb() {
         return movieRepo.findAll(Sort.by(Sort.Direction.DESC, "popularity"));
     }
 }

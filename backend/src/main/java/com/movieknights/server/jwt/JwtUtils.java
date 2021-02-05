@@ -12,7 +12,7 @@ import java.util.Date;
 
 
 @Component
-public class JwtUtils {
+public class  JwtUtils {
   private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
   @Value("${movieknights.app.jwtSecret}")
@@ -21,12 +21,10 @@ public class JwtUtils {
   @Value("${movieknights.app.jwtExpirationMs}")
   private int jwtExpirationMs;
 
-  public String generateJwtToken(Authentication authentication) {
-
-    UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+  public String generateJwtToken(String userEmail) {
 
     return Jwts.builder()
-        .setSubject((userPrincipal.getEmail()))
+        .setSubject(userEmail)
         .setIssuedAt(new Date())
         .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
         .signWith(SignatureAlgorithm.HS512, jwtSecret)
