@@ -14,6 +14,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,9 +34,10 @@ public class MovieService {
 
 
     public List<Movie> getAllMovies() {
+        Instant start = Instant.now();
         int countFor404 = 0;
         List<Movie> movies = new ArrayList<>();
-        for(int i = 20002; i <= 20002; i++) {
+        for(int i = 23301; i <= 24000; i++) {
             try {
                 movies.add(getMovieById(i));
                 System.out.println("ID " + i + " skapad!");
@@ -46,6 +49,12 @@ public class MovieService {
                 System.out.println("Antal 404: " + countFor404);
             }
         }
+        Instant end = Instant.now();
+        Duration between = Duration.between(start, end);
+        System.out.println(between.getSeconds());
+
+
+        System.out.println();
         return movies;
     }
 
@@ -142,7 +151,9 @@ public class MovieService {
         String backdropPath = null;
 
         try{
-            releaseDate = new SimpleDateFormat("yyyy-MM-dd").parse((String) movieMap.get("release_date"));
+            SimpleDateFormat simpleReleaseDate = new SimpleDateFormat("yyyy-MM-dd");
+            simpleReleaseDate.setTimeZone(TimeZone.getTimeZone("UTC"));
+            releaseDate = simpleReleaseDate.parse((String) movieMap.get("release_date"));
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -180,15 +191,23 @@ public class MovieService {
 
     private Person createPerson(Map<String, Object> p) {
         Map<String, Object> personMap = restTemplate.getForObject("https://api.themoviedb.org/3/person/"
-                + p.get("id") + "?api_key=" + TMDB_KEY, Map.class);
+                + p.get("id") + "?api_key=" + TMDB_KEY + "&language=sv", Map.class);
         if(personMap == null) return null;
 
         Date dob = null;
         Date dod = null;
         String profilePath = null;
         try {
-            if (personMap.get("birthday") != null) dob = new SimpleDateFormat("yyyy-MM-dd").parse((String) personMap.get("birthday"));
-            else if (personMap.get("deathday") != null) dod = new SimpleDateFormat("yyyy-MM-dd").parse((String) personMap.get("deathday"));
+            if (personMap.get("birthday") != null) {
+                SimpleDateFormat simpleDob = new SimpleDateFormat("yyyy-MM-dd");
+                simpleDob.setTimeZone(TimeZone.getTimeZone("UTC"));
+                dob = simpleDob.parse((String) personMap.get("birthday"));
+            }
+            if (personMap.get("deathday") != null) {
+                SimpleDateFormat simpleDod = new SimpleDateFormat("yyyy-MM-dd");
+                simpleDod.setTimeZone(TimeZone.getTimeZone("UTC"));
+                dod = simpleDod.parse((String) personMap.get("deathday"));
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -217,6 +236,6 @@ public class MovieService {
     }
 
     public List<Movie> getMoviesFromDb() {
-        return movieRepo.findAll(Sort.by(Sort.Direction.DESC, "popularity"));
+        return movieRepo.findAll(Sort.by(Sort.Direction.DESC, "movieId"));
     }
 }

@@ -1,85 +1,40 @@
 <template>
-  <div>
-    <Button @click="getCalendar" label="Get calendar"></Button>
-    <Button @click="createEvent" label="Create event"></Button>
-    <div class="calendar-container">
-      <div class="calendar" v-if="events.length > 0">
-        <FullCalendar :events="events" :options="state.options" />
-      </div>
-    </div>
+  <div class="calendar-container">
+    <Suspense>
+      <template #default>
+      <Calendar />
+      </template>
+      <template #fallback>
+        <h1>Laddar kalendern</h1>
+      </template>
+    </Suspense>
   </div>
 </template>
 
 <script>
-import { extFetch } from "@/modules/extFetch";
-import { ref, reactive } from "vue";
-import FullCalendar from "primevue/fullcalendar";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import EventHelper from "@/_helpers/EventHelper";
+import {useRouter} from 'vue-router'
+import Calendar from "@/components/Calendar"
+import UserHandler from '@/modules/UserHandler'
 
 export default {
-  components: { FullCalendar },
+  components: { Calendar },
   setup() {
-    const { events, event, createEvent } = EventHelper();
-    const result = ref(null);
-    let state = reactive({
-      options: {
-        plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-        initialDate: "2021-02-01",
-        headerToolbar: {
-          left: "prev,next",
-          center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay",
-        },
-        editable: true,
-        handleWindowResize: true,
-        contentHeight: "auto",
-        height: "auto",
-        eventOverlap: false,
-        eventDrop: (e) => {
-          event.start = e.event.start;
-          event.end = e.event.end;
-        },
-      },
-    });
-
-    async function getCalendar() {
-      result.value = await extFetch(
-        "/rest/calendar/freebusy",
-        "GET",
-        undefined,
-        true
-      );
-      Object.entries(result.value.calendars).forEach((calendar) => {
-        calendar[1].busy.forEach((event) => {
-          let start = new Date(event.start.value).toLocaleString();
-          let end = new Date(event.end.value).toLocaleString();
-          events.push({
-            id: events.length + 1,
-            title: "Busy",
-            start: start,
-            end: end,
-            editable: false,
-          });
-        });
-      });
+    const router = useRouter();
+    const {isLoggedIn} = UserHandler();
+    
+    if(!isLoggedIn.value) {
+      router.push("/")
     }
 
-    return { state, result, events, getCalendar, createEvent };
+    return { }
   },
 };
 </script>
 
-<style lang="scss" scoped>
-.calendar-container {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  justify-content: center;
-  .calendar {
+<style lang="scss" scope>
+  .calendar-container {
     display: grid;
-    grid-column: 3/11;
+    grid-template-columns: repeat(12, 1fr);
+    justify-content: center;
   }
-}
 </style>
