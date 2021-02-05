@@ -51,7 +51,7 @@
 
 <script>
 import { reactive } from 'vue';
-import EventHelper from "@/_helpers/EventHelper"
+import EventHelper from "@/modules/EventHelper"
 export default {
   name: 'MovieInfoModal',
   props: {movie: Object, showMovieInfo: Boolean},

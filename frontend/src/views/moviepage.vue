@@ -27,7 +27,7 @@
 
 import Movie from "@/components/Movie.vue";
 import MovieInfoModal from "@/components/MovieInfoModal.vue";
-import MovieHelper from "@/_helpers/MovieHelper";
+import MovieHelper from "@/modules/MovieHelper";
 import { reactive, onMounted } from 'vue';
 
 export default {

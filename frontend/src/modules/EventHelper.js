@@ -1,5 +1,5 @@
 import { reactive }  from "vue";
-import { extFetch } from "../modules/extFetch";
+import { extFetch } from "./extFetch";
 
 
 const event = reactive({
@@ -7,6 +7,7 @@ const event = reactive({
   title: null,
   start: null,
   end: null,
+  booked: false,
 });
 
 const events = reactive([]);
@@ -21,12 +22,11 @@ export default function EventHelper(){
     event.title = movie.title;
     event.start = newDate;
     event.end = new Date(event.start.getTime() + movie.runTime * 60000);
-
-    events.push(event);
   }
 
   async function createEvent() {
     await extFetch("rest/calendar/add", "POST", event, true)
+    event.booked = true;
   }
 
   return { event, events, addEventToCalendar, createEvent }
