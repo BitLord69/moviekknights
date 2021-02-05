@@ -17,7 +17,7 @@
         <Movie :movie="movie" v-for="(movie, index) in state.pagMovies && state.pagMovies.slice(state.first, state.first+18)" :key="index" @click="displayMovieInfo(movie)"/>
     </div>
         <MovieInfoModal v-if="state.showMovieInfo" :movie="state.selectedMovie"/>
-        <PersonInfoModal v-if="state.showPersonInfo" :person="state.selectedPerson"/>
+        <PersonInfoModal v-if="state.showPersonInfo" :person="state.selectedPerson" :movies="movies"/>
     
   </div>
 

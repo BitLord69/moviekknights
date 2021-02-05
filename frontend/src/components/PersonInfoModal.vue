@@ -16,10 +16,27 @@
             <span v-if="person.dob">Född: {{person.dob.slice(0, 10)}} <span v-if="!person.dod">({{moment(person.dob).locale('sv').fromNow(true)}})</span></span>
             <span v-if="person.dod">Död: {{person.dod.slice(0, 10)}}</span>
           </div>
-          <div class="overview">
+          <div v-if="state.biography.length > 3" class="overview">
             <div>
               <div>{{state.biography}} <span class="showMoreText" @click="toggleShowText()">{{state.showMoreText}}</span></div>
             </div>
+          </div>
+          <div class="cast">
+						<div class="p-d-flex p-jc-evenly p-mb-2">
+							<span @click="chooseMovieListToView('acting')">Skådespelat</span> | 
+							<span @click="chooseMovieListToView('directing')">Regisserat</span> | 
+							<span @click="chooseMovieListToView('composing')">Komponerat musiken till</span>
+						</div>
+						<div v-if="state.movieListChosen != 'acting'">
+							<div v-for="(movie, index) in state.filmographyDC" :key="index">
+								{{movie.title}} ({{movie.date}})
+							</div>
+						</div>
+						<div v-if="state.movieListChosen == 'acting'">
+							<div v-for="(movie, index) in state.filmographyA" :key="index">
+								{{movie.title}} ({{movie.date}}) - {{movie.character}}
+							</div>
+						</div>
           </div>
         </div>
       </div>
@@ -32,22 +49,72 @@ import { reactive } from 'vue';
 import moment from 'moment';
 export default {
   name: 'PersonInfoModal',
-  props: {person: Object, showPersonInfo: Boolean},
+  props: {person: Object, showPersonInfo: Boolean, movies: Array},
   setup(props){
     const state = reactive({
       showMore: false,
       showMoreText: "[läs mer...]",
-      biography: props.person && props.person.biography.slice(0, 150) + "...",
-    })
+			biography: props.person && props.person.biography.slice(0, 150) + "...",
+			filmographyA: [],
+			filmographyD: [],
+			filmographyC: [],
+			filmographyDC: [],
+			movieListChosen: "acting"
+		})
+		
+		getMoviesStarringPerson();
+		getMoviesDirectedByPerson();
+		getMoviesComposedByPerson();
+
+		function chooseMovieListToView(list) {
+			state.movieListChosen = list;
+			if(list == "directing") state.filmographyDC = state.filmographyD;
+			else if(list == "composing") state.filmographyDC = state.filmographyC;
+		}
 
     function toggleShowText() {
       state.showMore = !state.showMore
       state.showMoreText = state.showMore ? "[läs mindre...]" : "[läs mer...]"
       state.biography = state.showMore ?props.person && props.person.biography : props.person && props.person.biography.slice(0, 150) + "..."
     }
-    
 
-    return { state, moment, toggleShowText }
+    function getMoviesDirectedByPerson() {
+			props.movies.forEach(m => {
+        m.directors.forEach(p => {
+					if(p.id == props.person.id) {
+						state.filmographyD.push({title: m.title, date: m.releaseDate.slice(0, 4)})
+					}
+					
+        });
+			});
+			state.filmographyD = state.filmographyD.sort((a, b) => b.date - a.date)
+		}
+		
+		function getMoviesComposedByPerson() {
+			props.movies.forEach(m => {
+        m.composers.forEach(p => {
+					if(p.id == props.person.id) {
+						state.filmographyC.push({title: m.title, date: m.releaseDate.slice(0, 4)})
+					}
+					
+        });
+			});
+			state.filmographyC = state.filmographyC.sort((a, b) => b.date - a.date)
+		}
+		
+		function getMoviesStarringPerson() {
+			props.movies.forEach(m => {
+        m.cast.forEach(p => {
+					if(p.person.id == props.person.id) {
+						state.filmographyA.push({title: m.title, date: m.releaseDate.slice(0, 4), character: p.character})
+					}
+					
+        });
+			});
+			state.filmographyA = state.filmographyA.sort((a, b) => b.date - a.date)
+    }
+
+    return { state, moment, toggleShowText, chooseMovieListToView }
   }
 }
 </script>
@@ -73,11 +140,9 @@ export default {
 
 .modal-content {
   width: 100%;
-  pointer-events: auto;
   background-color: $bg-secondary;
   border: $border-primary;
   border-radius: $border-radius;
-  outline: 0;
 }
 
 .modal-header {
@@ -91,7 +156,7 @@ export default {
 .modal-body {
   display: grid;
   grid-template-columns: 225px auto;
-  grid-template-rows: 315px auto auto;
+  grid-template-rows: 315px 0px 390px;
   grid-template-areas:
     "poster info"
     "overview overview"
