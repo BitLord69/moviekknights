@@ -10,7 +10,7 @@ export default function MovieHelper(){
 
   async function getMovies(){
     try {
-      movies.value = await extFetch(url + "/db");
+      movies.value = await extFetch(url + "/");
     } catch (err) {
       movieError.value = err;
       return;

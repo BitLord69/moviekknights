@@ -36,8 +36,7 @@
               </Paginator>
             </div>
             <div style="display: flex">
-              <div class="characterBody" v-for="(cast, index) in displayCastTest().slice(state.first, state.first+5)" :key="index" @click="$parent.state.showPersonInfo = true;
-              $parent.state.selectedPerson = cast.person">
+              <div class="characterBody" v-for="(cast, index) in displayCastTest().slice(state.first, state.first+5)" :key="index">
                 <img :src="cast.person.profileImgPath != null ? cast.person.profileImgPath : '/img/noimage.png'" />
                 <span><strong>{{cast.person.name}}</strong></span>
                 <span>{{cast.character}}</span>
@@ -58,8 +57,6 @@ export default {
   setup(props){
     const state = reactive({
       showMore: false,
-      showPersonInfo: false,
-      selectedPerson: null,
       showMoreText: "[läs mer...]",
       overview: props.movie && props.movie.overview.slice(0, 150) + "...",
       first: 0,
@@ -95,13 +92,8 @@ export default {
         return h + " h " + min + " min"
       }
     }
-
-    function displayPersonInfo(person) {
-      state.showPersonInfo = !state.showPersonInfo;
-      state.selectedPerson = person
-    }
     
-    return { state, time, displayCast, toggleShowText, displayCastTest, displayPersonInfo }
+    return { state, time, displayCast, toggleShowText, displayCastTest }
   }
 }
 </script>
@@ -121,11 +113,11 @@ export default {
   width: 40%;
   margin: 10px auto;
   height: 90%;
-  z-index: 2;
 }
 
 .modal-content {
   width: 100%;
+  pointer-events: auto;
   background-color: $bg-secondary;
   border: $border-primary;
   border-radius: $border-radius;
@@ -171,7 +163,7 @@ export default {
 
 .poster {
   grid-area: poster;
-  z-index: 2;
+  z-index: 1;
   img {
     width: 210px;
     height:300px;
@@ -180,19 +172,19 @@ export default {
 }
 .info {
   grid-area: info;
-  z-index: 2;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 .overview {
   grid-area: overview;
-  z-index: 2;
+  z-index: 1;
 }
 .cast {
   grid-area: cast;
   display: flex;
-  z-index: 2;
+  z-index: 1;
   flex-direction: column;
   margin-top: 15px;
   .p-paginator {
@@ -205,7 +197,6 @@ export default {
     margin-top: 15px;
     width: 20%;
     text-align: center !important;
-    cursor: pointer;
   }
 }
 .characterBody img {

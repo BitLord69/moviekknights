@@ -17,7 +17,6 @@
         <Movie :movie="movie" v-for="(movie, index) in state.pagMovies && state.pagMovies.slice(state.first, state.first+18)" :key="index" @click="displayMovieInfo(movie)"/>
     </div>
         <MovieInfoModal v-if="state.showMovieInfo" :movie="state.selectedMovie"/>
-        <PersonInfoModal v-if="state.showPersonInfo" :person="state.selectedPerson" :movies="movies"/>
     
   </div>
 
@@ -28,22 +27,19 @@
 
 import Movie from "@/components/Movie.vue";
 import MovieInfoModal from "@/components/MovieInfoModal.vue";
-import PersonInfoModal from '@/components/PersonInfoModal';
 import MovieHelper from "@/_helpers/MovieHelper";
 import { reactive, onMounted } from 'vue';
 
 export default {
   name: "Movies",
-  components: { Movie, MovieInfoModal, PersonInfoModal },
+  components: { Movie, MovieInfoModal },
   setup(){
     const { getMovies, getMovieCount, movies, movieCount, movieError } = MovieHelper();
     let state = reactive({
       first: 0,
       pagMovies: movies,
       showMovieInfo: false,
-      showPersonInfo: false,
-      selectedMovie: null,
-      selectedPerson: null
+      selectedMovie: null
     })
 
     onMounted(async () => {
