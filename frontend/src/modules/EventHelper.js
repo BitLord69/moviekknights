@@ -1,4 +1,4 @@
-import { reactive }  from "vue";
+import { reactive, ref }  from "vue";
 import { extFetch } from "./extFetch";
 
 
@@ -10,6 +10,8 @@ const event = reactive({
   booked: false,
 });
 
+const showEventForm = ref(false);
+const eventsToBook = reactive([]);
 const events = reactive([]);
 
 export default function EventHelper(){
@@ -22,6 +24,8 @@ export default function EventHelper(){
     event.title = movie.title;
     event.start = newDate;
     event.end = new Date(event.start.getTime() + movie.runTime * 60000);
+    eventsToBook.push({...event, duration: movie.runTime});
+    showEventForm.value = true; 
   }
 
   async function createEvent() {
@@ -29,5 +33,5 @@ export default function EventHelper(){
     event.booked = true;
   }
 
-  return { event, events, addEventToCalendar, createEvent }
+  return { event, events, eventsToBook, showEventForm, addEventToCalendar, createEvent }
 }

@@ -13,6 +13,7 @@ import FullCalendar from 'primevue/fullcalendar';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import svLocale from '@fullcalendar/core/locales/sv'
 import UserHandler from '@/modules/UserHandler';
 import EventHelper from '@/modules/EventHelper';
 
@@ -42,6 +43,9 @@ components: { FullCalendar },
 					event.start = e.event.start;
 					event.end = e.event.end;
 				},
+				slotMinTime: "08:00:00",
+				firstDay: 1,
+				locale: svLocale,
       },
 		})
 		
