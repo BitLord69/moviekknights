@@ -12,7 +12,7 @@
           </div>
           <div class="info">
             <h3 class="p-m-0">{{person.name}}</h3>
-            <hr style="" />
+            <hr />
             <span v-if="person.dob">Född: {{person.dob.slice(0, 10)}} <span v-if="!person.dod">({{moment(person.dob).locale('sv').fromNow(true)}})</span></span>
             <span v-if="person.dod">Död: {{person.dod.slice(0, 10)}}</span>
           </div>
@@ -23,10 +23,11 @@
           </div>
           <div class="cast">
 						<div class="p-d-flex p-jc-evenly p-mb-2">
-							<span @click="chooseMovieListToView('acting')">Skådespelat</span> | 
-							<span @click="chooseMovieListToView('directing')">Regisserat</span> | 
-							<span @click="chooseMovieListToView('composing')">Komponerat musiken till</span>
+							<Button @click="chooseMovieListToView('acting')">Skådespelat</Button>
+							<Button @click="chooseMovieListToView('directing')">Regisserat</Button>
+							<Button @click="chooseMovieListToView('composing')">Komponerat musiken till</Button>
 						</div>
+            <hr />
 						<div v-if="state.movieListChosen != 'acting'">
 							<div v-for="(movie, index) in state.filmographyDC" :key="index">
 								{{movie.title}} ({{movie.date}})
@@ -156,7 +157,7 @@ export default {
 .modal-body {
   display: grid;
   grid-template-columns: 225px auto;
-  grid-template-rows: 315px 0px 390px;
+  grid-template-rows: 315px 0px minmax(50px, 390px);
   grid-template-areas:
     "poster info"
     "overview overview"

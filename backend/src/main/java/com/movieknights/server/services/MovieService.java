@@ -37,7 +37,7 @@ public class MovieService {
         Instant start = Instant.now();
         int countFor404 = 0;
         List<Movie> movies = new ArrayList<>();
-        for(int i = 23301; i <= 24000; i++) {
+        for(int i = 35001; i <= 45000; i++) {
             try {
                 movies.add(getMovieById(i));
                 System.out.println("ID " + i + " skapad!");
@@ -51,7 +51,7 @@ public class MovieService {
         }
         Instant end = Instant.now();
         Duration between = Duration.between(start, end);
-        System.out.println(between.getSeconds());
+        System.out.println((between.getSeconds() / 60) + " min");
 
 
         System.out.println();
