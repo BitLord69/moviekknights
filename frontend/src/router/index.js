@@ -27,12 +27,6 @@ const routes = [
       import("../views/LogMeOut.vue"),
   },
   {
-    path: "/calendar",
-    name: "Calendar",
-    component: () =>
-      import("../views/calendarpage.vue"),
-  },
-  {
     path: "/movies",
     name: "Movies",
     component: () =>

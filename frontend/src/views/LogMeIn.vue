@@ -1,6 +1,6 @@
 <template>
   <Button class="p-button-raised p-button-success" @click="performLogin">
-    <i class="fab fa-google p-mr-2"></i>Login with Google</Button
+    <i class="fab fa-google p-mr-2"></i>Logga in med Google</Button
   >
 </template>
 

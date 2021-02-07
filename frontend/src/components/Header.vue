@@ -16,19 +16,12 @@
 <script>
 
 import UserHandler from "@/modules/UserHandler";
-
 export default {
-  
  async setup() {
-  
   const { isLoggedIn, currentUser, startApp } = UserHandler();
-
   await startApp();
-  
-
   return { isLoggedIn, currentUser }
   }
-
 }
 </script>
 <style lang="scss" scoped>

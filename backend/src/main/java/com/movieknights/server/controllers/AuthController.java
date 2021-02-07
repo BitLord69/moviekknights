@@ -71,13 +71,11 @@ public class AuthController {
       e.printStackTrace();
       return new ResponseEntity("Error, tokenResponse", HttpStatus.BAD_REQUEST);
     }
-
     // Get user info
     User user = createOrUpdateUser(tokenResponse);
     if (user == null) {
       return new ResponseEntity("Error, no payload from Google", HttpStatus.BAD_REQUEST);
     }
-
     // Authenticate and return user details
     return authenticateUser(user);
   }

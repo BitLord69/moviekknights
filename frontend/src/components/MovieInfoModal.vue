@@ -3,7 +3,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <Button>Skapa event</Button>
+          <Button @click="addEventToCalendar(movie)">Skapa event</Button>
           <Button icon="pi pi-times" @click="$parent.state.showMovieInfo = false" />
         </div>
         <div class="modal-body" :style="{backgroundImage: `url(${movie.backdropPath != null ? movie.backdropPath : '/img/noimagebackdrop.png'})`}">
@@ -52,10 +52,12 @@
 
 <script>
 import { reactive } from 'vue';
+import EventHelper from "@/modules/EventHelper"
 export default {
   name: 'MovieInfoModal',
   props: {movie: Object, showMovieInfo: Boolean},
   setup(props){
+    const { addEventToCalendar } = EventHelper();
     const state = reactive({
       showMore: false,
       showPersonInfo: false,
@@ -101,7 +103,7 @@ export default {
       state.selectedPerson = person
     }
     
-    return { state, time, displayCast, toggleShowText, displayCastTest, displayPersonInfo }
+    return { state, time, displayCast, toggleShowText, displayCastTest, addEventToCalendar, displayPersonInfo }
   }
 }
 </script>
