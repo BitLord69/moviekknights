@@ -1,6 +1,5 @@
 <template>
   <div v-if="isLoggedIn && events && events.length > 0" class="calendar">
-		<Button @click="createEvent" label="Bekräfta evenemang"></Button>
 		<FullCalendar :events="events" :options="state.options"/>
   </div>
 	<div v-else><h1>Här var det tomt...</h1></div>
