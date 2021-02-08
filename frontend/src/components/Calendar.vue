@@ -1,6 +1,5 @@
 <template>
   <div v-if="isLoggedIn && events && events.length > 0" class="calendar">
-		<Button @click="createEvent" label="Bekräfta evenemang"></Button>
 		<FullCalendar :events="events" :options="state.options"/>
   </div>
 	<div v-else><h1>Här var det tomt...</h1></div>
@@ -13,6 +12,7 @@ import FullCalendar from 'primevue/fullcalendar';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import svLocale from '@fullcalendar/core/locales/sv'
 import UserHandler from '@/modules/UserHandler';
 import EventHelper from '@/modules/EventHelper';
 
@@ -42,6 +42,9 @@ components: { FullCalendar },
 					event.start = e.event.start;
 					event.end = e.event.end;
 				},
+				slotMinTime: "08:00:00",
+				firstDay: 1,
+				locale: svLocale,
       },
 		})
 		
