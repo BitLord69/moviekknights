@@ -10,5 +10,4 @@ import java.util.Optional;
 
 @Repository
 public interface MovieRepo extends Neo4jRepository<Movie, Long> {
-    Optional<Movie> findMovieByMovieId(long id);
 }
