@@ -18,7 +18,7 @@
         <Movie :movie="movie" v-for="(movie, index) in state.pagMovies && state.pagMovies.slice(state.first, state.first+18)" :key="index" @click="displayMovieInfo(movie)"/>
     </div>
         <MovieInfoModal v-if="state.showMovieInfo" :movie="state.selectedMovie"/>
-        <PersonInfoModal v-if="state.showPersonInfo" :person="state.selectedPerson" :movies="movies"/>
+        <PersonInfoModal v-if="state.showPersonInfo" :person="state.selectedPerson" :movies="movies" :movieListChosen="state.movieListChosen" />
   </div>
 </template>
 
@@ -37,12 +37,13 @@ export default {
     const { getMovies, getMovieCount, movies, movieCount, movieError } = MovieHelper();
     let state = reactive({
       first: 0,
-      pagMovies: movies.value,
+      pagMovies: movies,
       showMovieInfo: false,
       selectedMovie: null,
       searchTerm: '',
       filteredMovies: movies.value,
       selectedPerson: null,
+      movieListChosen: "",
     })
 
     watchEffect(() => {
@@ -72,7 +73,7 @@ export default {
       }
       else {
         state.filteredMovies = movies.value.filter((movie) => {
-            return movie.title.toLowerCase().startsWith(event.query.toLowerCase());
+            return movie.title.toLowerCase().startsWith(event.query.toLowerCase()) || movie.originalTitle.toLowerCase().startsWith(event.query.toLowerCase());
         });
       }
     }
@@ -96,6 +97,10 @@ export default {
   .paginator {
     grid-row: 1/2;
     grid-column: 3/11;
+    .p-paginator-left-content {
+      width:33%;
+      margin-right: 0;
+  }
   }
 
   #movie-page{
@@ -125,13 +130,12 @@ export default {
     justify-content: space-between;
   }
 
-  .p-autocomplete-panel {
-    background-color: $bg-primary;
+  .p-ink-active {
+    border: $border-hover !important;
   }
 
-  .p-paginator-left-content {
-    width:33%;
-    margin-right: 0 !important;
+  .p-autocomplete-panel {
+    background-color: $bg-primary;
   }
 
   .p-paginator-right-content {

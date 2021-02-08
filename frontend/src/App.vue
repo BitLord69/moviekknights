@@ -20,6 +20,7 @@ export default {
 
 <style lang="scss">
 @import "@/styles/_variables.scss";
+
 body {
   background-color: $bg-primary;
   font-size: 16px;
@@ -34,6 +35,15 @@ body {
   color: $text-primary;
   height:100%;
   font-family: "Sarala", sans-serif;
+}
+
+a, .crewLink {
+  color: $text-secondary;
+  text-decoration-line: none;
+  cursor: pointer;
+  &:hover {
+    text-decoration-line: underline;
+  }
 }
 
 h1 {
@@ -56,6 +66,7 @@ h3 {
   background-color: $bg-secondary !important;
   font-family: "Sarala", sans-serif !important;
 }
+
 .p-button{
   color: $text-secondary !important;
   font-family: inherit !important;
@@ -70,6 +81,118 @@ h3 {
   .p-button-icon{
     color: $text-secondary;
   }
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.modal-dialog {
+  width: 40%;
+  margin: 2% auto;
+  height: 96%;
+  z-index: 2;
+}
+
+.modal-content {
+  width: 100%;
+  background-color: $bg-secondary;
+  border: $border-primary;
+  border-radius: $border-radius;
+}
+
+.modal-header {
+  display: flex;
+  padding: 1rem;
+  border-bottom: $border-primary;
+}
+
+.modal-body {
+  display: grid;
+  grid-template-columns: 225px auto;
+  padding: 2%;
+  text-align: left;
+}
+
+.poster {
+  grid-area: poster;
+  z-index: 2;
+  img {
+    width: 210px;
+    height:300px;
+    box-shadow: $boxshadow;
+  }
+}
+
+.info {
+  grid-area: info;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+hr {
+  width: 100%;
+  border-color: $text-secondary;
+}
+
+.showMoreText {
+  cursor: pointer;
+  color: $text-secondary;
+}
+
+@media only screen and (max-width: 1600px) {
+  .modal-dialog {
+    width: 45%;
+  }
+}
+
+@media only screen and (max-width: 1440px) {
+  .modal-dialog {
+    width: 53%;
+  }
+}
+
+@media only screen and (max-width: 1200px) {
+  .modal-dialog {
+    width: 62%;
+  }
+}
+
+@media only screen and (max-width: 1024px) {
+  .modal-dialog {
+    width: 75%;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  .modal-dialog {
+    width: 94%;
+  }
+
+  .modal-body {
+    grid-template-columns: 175px auto;
+  }
+
+  .poster {
+    display: flex;
+    justify-content: center;
+  }
+
+  .poster img {
+    width: 160px;
+    height:240px;
+  }
+
+  .modal-header {
+  padding: .5rem;
+}
 }
 </style>
 

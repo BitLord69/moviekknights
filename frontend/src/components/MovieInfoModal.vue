@@ -16,19 +16,36 @@
             <hr style="" />
             <span>Speltid: {{time()}}</span>
             <span>Genre(s): {{movie.genres.map(g => g.name ).join(', ')}}</span>
-            <span>Regisserad av: {{movie.directors.map(d => d.name ).join(', ')}}</span>
-            <span>Kompositör(er): {{movie.composers.map(c => c.name ).join(', ')}}</span>
-            <span>Skådespelare: {{displayCast()}}</span>
+            <span>
+              Regisserad av:
+                <span v-for="(director, index) in movie.directors" :key="index">
+                  <span class="crewLink" @click="$parent.state.showPersonInfo = true;
+                  $parent.state.selectedPerson = director; $parent.state.movieListChosen = 'directing'">
+                    {{director.name}}
+                  </span>
+                  <span v-if="index + 1 < movie.directors.length">, </span>
+                </span>
+            </span>
+            <span>
+              Kompositör(er):
+                <span v-for="(composer, index) in movie.composers" :key="index">
+                  <span class="crewLink" @click="$parent.state.showPersonInfo = true;
+                  $parent.state.selectedPerson = composer; $parent.state.movieListChosen = 'composing'">
+                    {{composer.name}} 
+                  </span>
+                  <span v-if="index + 1 < movie.composers.length">, </span>
+                </span>
+            </span>
           </div>
           <div class="overview">
             <div>
               <div v-if="movie.tagline.length > 0"><em>"{{movie.tagline}}"</em></div>
-              <div>{{state.overview}} <span class="showMoreText" @click="toggleShowText()">{{state.showMoreText}}</span></div>
+              <div v-if="state.overview.length > 3">{{state.overview}} <span class="showMoreText" @click="toggleShowText()">{{state.showMoreText}}</span></div>
             </div>
           </div>
           <div class="cast">
             <div>
-              <Paginator v-model:first="state.first" :rows="5" :totalRecords="state.castCount" class="paginator"
+              <Paginator v-model:first="state.first" :rows="5" :totalRecords="state.castCount"
               template="PrevPageLink NextPageLink">
                 <template #left>
                   <span class="p-pl-2">Skådespelare:</span>
@@ -36,8 +53,8 @@
               </Paginator>
             </div>
             <div style="display: flex">
-              <div class="characterBody" v-for="(cast, index) in displayCastTest().slice(state.first, state.first+5)" :key="index" @click="$parent.state.showPersonInfo = true;
-              $parent.state.selectedPerson = cast.person">
+              <div class="characterBody" v-for="(cast, index) in displayCast().slice(state.first, state.first+5)" :key="index" @click="$parent.state.showPersonInfo = true;
+              $parent.state.selectedPerson = cast.person; $parent.state.movieListChosen = 'acting'">
                 <img :src="cast.person.profileImgPath != null ? cast.person.profileImgPath : '/img/noimage.png'" />
                 <span><strong>{{cast.person.name}}</strong></span>
                 <span>{{cast.character}}</span>
@@ -74,14 +91,9 @@ export default {
       state.overview = state.showMore ?props.movie && props.movie.overview : props.movie && props.movie.overview.slice(0, 150) + "..."
     }
     
-    function displayCastTest() {
-      let cast = props.movie.cast
-      return cast.sort((a, b) => a.order - b.order)
-    }
-
     function displayCast() {
       let cast = props.movie.cast
-      return cast.sort((a, b) => a.order - b.order).slice(0, 5).map(c => c.person.name ).join(', ')
+      return cast.sort((a, b) => a.order - b.order)
     }
 
     function time() {
@@ -103,61 +115,30 @@ export default {
       state.selectedPerson = person
     }
     
-    return { state, time, displayCast, toggleShowText, displayCastTest, addEventToCalendar, displayPersonInfo }
+    return { state, time, displayCast, toggleShowText, addEventToCalendar, displayPersonInfo }
   }
 }
 </script>
 
 <style lang="scss" scoped>
 @import "@/styles/_variables.scss";
-.overlay {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.6);
-}
-
-.modal-dialog {
-  width: 40%;
-  margin: 10px auto;
-  height: 90%;
-  z-index: 2;
-}
-
-.modal-content {
-  width: 100%;
-  background-color: $bg-secondary;
-  border: $border-primary;
-  border-radius: $border-radius;
-  outline: 0;
-}
 
 .modal-header {
-  display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  padding: 1rem;
-  border-bottom: $border-primary;
 }
 
 .modal-body {
-  display: grid;
-  grid-template-columns: 225px auto;
+  height: 90%;
   grid-template-rows: 315px auto auto;
   grid-template-areas:
     "poster info"
     "overview overview"
     "cast cast";
-  padding: 2%;
-  text-align: left;
   position: relative;
   background-size: cover;
   background-position: center center;
   background-attachment: fixed;
   background-repeat: no-repeat;
-  overflow-y: auto;
 }
 
 .modal-body::before {
@@ -171,22 +152,6 @@ export default {
     opacity: 0.9;
 }
 
-.poster {
-  grid-area: poster;
-  z-index: 2;
-  img {
-    width: 210px;
-    height:300px;
-    box-shadow: $boxshadow;
-  }
-}
-.info {
-  grid-area: info;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
 .overview {
   grid-area: overview;
   z-index: 2;
@@ -201,6 +166,7 @@ export default {
     justify-content: flex-end !important;
     padding: 0 !important;
   }
+  
   .characterBody {
     display: flex;
     flex-direction: column;
@@ -208,8 +174,13 @@ export default {
     width: 20%;
     text-align: center !important;
     cursor: pointer;
+    &:hover img{
+      border: $border-hover;
+      box-shadow: $boxshadow;
+    }
   }
 }
+
 .characterBody img {
   align-self: center;
   object-fit: cover;
@@ -217,17 +188,21 @@ export default {
   width: 90%;
   height: 130px;
   border-radius: 50%;
-  border: $border-primary
+  border: $border-primary;
 }
 
-hr {
-  width: 100%;
-  border-color: $text-secondary;
-}
+@media only screen and (max-width: 800px) {
+  .characterBody img {
+    height: 70px;
+  }
 
-.showMoreText {
-  cursor: pointer;
-  color: $text-secondary;
+  .modal-body {
+    grid-template-rows: 255px auto auto auto;
+    grid-template-areas:
+      "poster poster"
+      "info info"
+      "overview overview"
+      "cast cast";
+  }
 }
-
 </style>
