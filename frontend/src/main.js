@@ -7,6 +7,9 @@ import VueGapi from "vue-gapi";
 import PrimeVue from "primevue/config";
 import Paginator from 'primevue/paginator';
 import Button from 'primevue/button';
+import Dropdown from 'primevue/dropdown';
+import Calendar from 'primevue/calendar';
+import Dialog from 'primevue/dialog';
 
 import "primeflex/primeflex.css";
 import "primeicons/primeicons.css";
@@ -24,6 +27,9 @@ app.use(PrimeVue, { ripple: true });
 app.use(router);
 app.component("Paginator", Paginator);
 app.component("Button", Button);
+app.component("Dropdown", Dropdown);
+app.component("PrimeCalendar", Calendar);
+app.component("Dialog", Dialog);
 
 app.mount('#app')
 

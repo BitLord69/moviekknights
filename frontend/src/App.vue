@@ -35,6 +35,7 @@ body {
   color: $text-primary;
   height:100%;
   font-family: "Sarala", sans-serif;
+  transition: border .2s;
 }
 
 a, .crewLink {
