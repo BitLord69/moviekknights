@@ -28,8 +28,10 @@ export default function EventHelper(){
     showEventForm.value = true; 
   }
 
-  async function createEvent() {
-    await extFetch("rest/calendar/add", "POST", event, true)
+  async function createEvent(newEvent) {
+    let newDate = new Date(newEvent.end);
+    newEvent.end = newDate;
+    await extFetch("rest/calendar/add", "POST", newEvent, true)
     event.booked = true;
   }
 

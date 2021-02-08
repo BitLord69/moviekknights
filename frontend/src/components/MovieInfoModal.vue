@@ -6,7 +6,7 @@
           <Button @click="toggleConfirmation">Skapa event</Button>
           <Button icon="pi pi-times" @click="$parent.state.showMovieInfo = false" />
         </div>
-      <Dialog header="Confirmation" :visible="state.displayConfirmation" :style="{width: '350px'}" :modal="true">
+      <Dialog header="Bekräfta" :visible="state.displayConfirmation" :style="{width: '350px'}" :modal="true">
         <div class="confirmation-content">
           <i class="pi pi-exclamation-triangle p-mr-3" style="font-size: 2rem" />
           <span>Filmen har lagts till i dina bokningar. Vill du fortsätta till bokningen?</span>
