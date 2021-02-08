@@ -21,6 +21,7 @@ export async function extFetch(url, method, body, getFromProtectedPart = false) 
       token = parseJwt(userUnpacked.accessToken)
       let time = Date.now()/1000;
       if(token.exp - time < 300){
+        console.log("Trying to get refresh(ed)!");
         await refreshToken();
       }
     }

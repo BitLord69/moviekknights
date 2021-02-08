@@ -107,7 +107,6 @@ public class AuthController {
 
     GoogleCredential cred =  getRefreshedCredentials(user.getRefreshToken());
     assert cred != null;
-    user.setRefreshToken(cred.getRefreshToken());
     user.setGoogleAccessToken(cred.getAccessToken());
     userRepo.save(user);
 
