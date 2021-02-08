@@ -134,7 +134,6 @@ public class MovieService {
                                             TextUtil.pimpString(e.toString(), TextUtil.LEVEL_WARNING));
                     }
 
-
                     Person person = createPerson(p);
                     cast.add(new HasActor(person, (String) p.get("character"), (int) p.get("order")));
                     return person;
@@ -261,16 +260,16 @@ public class MovieService {
                 (int) p.get("gender"),
                 (boolean) p.get("adult")
         );
-        // TODO: 2021-02-06 Ask Alex about this!
-        // Save the person here so it exists for other threads... good or not?
-        try {
-            personRepo.save(person);
-        } catch (Exception e) {
-            System.out.printf("Error doing trying to save in %s: person with the id %s\nError: %s\n",
-                TextUtil.pimpString("createPerson", TextUtil.LEVEL_INFO),
-                TextUtil.pimpString(person.getId(), TextUtil.LEVEL_INFO),
-                TextUtil.pimpString(e.toString(), TextUtil.LEVEL_WARNING));
-        }
+//        // TODO: 2021-02-06 Ask Alex about this!
+//        // Save the person here so it exists for other threads... good or not?
+//        try {
+//            personRepo.save(person);
+//        } catch (Exception e) {
+//            System.out.printf("Error doing trying to save in %s: person with the id %s\nError: %s\n",
+//                TextUtil.pimpString("createPerson", TextUtil.LEVEL_INFO),
+//                TextUtil.pimpString(person.getId(), TextUtil.LEVEL_INFO),
+//                TextUtil.pimpString(e.toString(), TextUtil.LEVEL_WARNING));
+//        }
 
         return person;
     }

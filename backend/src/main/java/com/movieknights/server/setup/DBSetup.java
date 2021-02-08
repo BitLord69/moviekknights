@@ -52,9 +52,6 @@ public class DBSetup {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-       /* DBUpdate dbUpdate = new DBUpdate(inputFile);
-        Thread thread = new Thread(dbUpdate);
-        thread.start();*/
     }
 
     private void downloadMovies(long lastId) throws InterruptedException {
@@ -65,7 +62,7 @@ public class DBSetup {
         }
 
         pool.shutdown();
-        pool.awaitTermination(5, TimeUnit.SECONDS);
+        pool.awaitTermination(30, TimeUnit.SECONDS);
     }
 
     private long checkDB() {
