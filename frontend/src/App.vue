@@ -10,11 +10,6 @@
 import Header from "@/components/Header.vue";
 export default {
   components: { Header },
-  setup() {
-    const test = false;
-
-    return { test }
-  }
 };
 </script>
 
