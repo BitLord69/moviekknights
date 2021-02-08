@@ -4,6 +4,7 @@ package com.movieknights.server.setup;
 import com.movieknights.server.entities.DBSetting;
 import com.movieknights.server.entities.LastLineDTO;
 import com.movieknights.server.repos.DBSettingRepo;
+import com.movieknights.server.services.MovieService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
 @NoArgsConstructor
@@ -36,24 +40,40 @@ public class DBSetup {
     @Autowired
     private DBSettingRepo dbSettingRepo;
 
+    @Autowired
+    private MovieService movieService;
+
     @PostConstruct
     public void run() {
-        checkDB();
+        long lastId = checkDB();
 
-       /* DBUpdate dbUpdate = new DBUpdate(inputFile);
-        Thread thread = new Thread(dbUpdate);
-        thread.start();*/
+        try {
+            downloadMovies(lastId);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void checkDB() {
+    private void downloadMovies(long lastId) throws InterruptedException {
+        ExecutorService pool = Executors.newFixedThreadPool(10);
+
+        for (long id = 1l; id < lastId; id++) { //Your ArrayList
+            pool.execute(new DownloadMovieTask(id, movieService));
+        }
+
+        pool.shutdown();
+        pool.awaitTermination(30, TimeUnit.SECONDS);
+    }
+
+    private long checkDB() {
         LocalDate localDate = LocalDate.now().minusDays(1);
-        String text = localDate.toString();
         Optional<DBSetting> dbSetting = dbSettingRepo.findById(localDate);
         if (dbSetting.isPresent()) {
-            return;
+            return dbSetting.get().getLastIndex();
         }
         getFileFromUrl();
         dbSettingRepo.save(new DBSetting(localDate, numberOfLines, lineDTO.getId()));
+        return lineDTO.getId();
     }
 
     private void getFileFromUrl() {
