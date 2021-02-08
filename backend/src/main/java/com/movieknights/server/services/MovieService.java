@@ -6,10 +6,13 @@ import com.movieknights.server.entities.Person;
 import com.movieknights.server.relationships.HasActor;
 import com.movieknights.server.repos.MovieRepo;
 import com.movieknights.server.repos.PersonRepo;
+import com.movieknights.server.utils.TextUtil;
+import org.neo4j.driver.exceptions.NoSuchRecordException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
@@ -40,7 +43,6 @@ public class MovieService {
         for(int i = 35001; i <= 45000; i++) {
             try {
                 movies.add(getMovieById(i));
-                System.out.println("ID " + i + " skapad!");
             }
             catch (Exception e) {
                 countFor404++;
@@ -59,15 +61,25 @@ public class MovieService {
     }
 
     public Movie getMovieById(long id) {
-        //Optional<Movie> optional = movieRepo.findMovieByMovieId((long) id);
         Optional<Movie> optional = movieRepo.findById(id);
         if(optional.isPresent()) {
+            System.out.println("ID " + TextUtil.pimpString(id, TextUtil.LEVEL_INFO) + " is already in the database!");
             return optional.get();
         }
 
-        Map<String, Object> movieMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/"
+        Map<String, Object> movieMap = null;
+
+        try {
+            movieMap = restTemplate.getForObject("https://api.themoviedb.org/3/movie/"
                 + id + "?api_key=" + TMDB_KEY + "&language=sv&append_to_response=credits", Map.class);
-        if(movieMap == null) {
+        } catch (HttpClientErrorException e) {
+            System.out.printf("Error getting movie with id: %s!\nError: %s\n",
+                                TextUtil.pimpString(id, TextUtil.LEVEL_WARNING),
+                                TextUtil.pimpString(e.toString(), TextUtil.LEVEL_WARNING));
+            return null;
+        }
+
+        if (movieMap == null) {
             return null;
         }
 
@@ -76,8 +88,19 @@ public class MovieService {
 
         Movie movie = createMovie(movieMap, creditsMap, id);
 
-        movieRepo.save(movie);
+        try {
+            movieRepo.save(movie);
+        } catch(Exception e) {
+            System.out.printf("Error in %s when trying to save movie: %s, %s\nError: %s\n",
+                    TextUtil.pimpString("getMovieById", TextUtil.LEVEL_INFO),
+                    TextUtil.pimpString(movie.getTitle(), TextUtil.LEVEL_WARNING),
+                    TextUtil.pimpString(movie.getMovieId(), TextUtil.LEVEL_WARNING),
+                    TextUtil.pimpString(e.toString(), TextUtil.LEVEL_WARNING));
+        }
 
+        System.out.printf("Movie '%s' with id %s  saved in the database!\n",
+                            TextUtil.pimpString(movie.getTitle(), TextUtil.LEVEL_INFO),
+                            TextUtil.pimpString(id, TextUtil.LEVEL_INFO));
         return movie;
     }
 
@@ -98,21 +121,25 @@ public class MovieService {
                 .stream()
                 .map(p -> {
                     long id = (int) p.get("id");
-                    Optional<Person> optional = personRepo.findById(id);
-                    if(optional.isPresent()) {
-                        cast.add(new HasActor(optional.get(), (String) p.get("character"), (int) p.get("order")));
-                        return optional.get();
+                    try {
+                        Optional<Person> optional = personRepo.findById(id);
+                        if (optional.isPresent()) {
+                            cast.add(new HasActor(optional.get(), (String) p.get("character"), (int) p.get("order")));
+                            return optional.get();
+                        }
+                    } catch (Exception e) {
+                        System.out.printf("getCastByMovieId - Error doing a %s on person with the id %s\nError: %s\n",
+                                            TextUtil.pimpString("personRepo.findById", TextUtil.LEVEL_INFO),
+                                            TextUtil.pimpString(id, TextUtil.LEVEL_INFO),
+                                            TextUtil.pimpString(e.toString(), TextUtil.LEVEL_WARNING));
                     }
 
                     Person person = createPerson(p);
-
                     cast.add(new HasActor(person, (String) p.get("character"), (int) p.get("order")));
-
                     return person;
                 })
-                .filter(p ->  p != null )
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-
 
         return cast;
     }
@@ -125,17 +152,22 @@ public class MovieService {
                         return null;
                     } else {
                         long id = (int) p.get("id");
-                        Optional<Person> optional = personRepo.findById(id);
-                        if(optional.isPresent()) {
-                            return optional.get();
+                        try {
+                            Optional<Person> optional = personRepo.findById(id);
+                            if(optional.isPresent()) {
+                                return optional.get();
+                            }
+                        } catch (Exception e) {
+                            System.out.printf("getCrewByMovieId - Error doing a %s on person with the id %s\nError: %s\n",
+                                TextUtil.pimpString("personRepo.findById", TextUtil.LEVEL_INFO),
+                                TextUtil.pimpString(id, TextUtil.LEVEL_INFO),
+                                TextUtil.pimpString(e.toString(), TextUtil.LEVEL_WARNING));
                         }
 
-                        Person person = createPerson(p);
-
-                        return person;
+                        return createPerson(p);
                     }
                 })
-                .filter(p ->  p != null )
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         return credits;
@@ -213,7 +245,7 @@ public class MovieService {
         }
 
         if(p.get("profile_path") != null) {
-            profilePath = "https://image.tmdb.org/t/p/original" + (String) p.get("profile_path");
+            profilePath = "https://image.tmdb.org/t/p/original" + p.get("profile_path");
         }
 
         Person person = new Person(
@@ -228,6 +260,17 @@ public class MovieService {
                 (int) p.get("gender"),
                 (boolean) p.get("adult")
         );
+//        // TODO: 2021-02-06 Ask Alex about this!
+//        // Save the person here so it exists for other threads... good or not?
+//        try {
+//            personRepo.save(person);
+//        } catch (Exception e) {
+//            System.out.printf("Error doing trying to save in %s: person with the id %s\nError: %s\n",
+//                TextUtil.pimpString("createPerson", TextUtil.LEVEL_INFO),
+//                TextUtil.pimpString(person.getId(), TextUtil.LEVEL_INFO),
+//                TextUtil.pimpString(e.toString(), TextUtil.LEVEL_WARNING));
+//        }
+
         return person;
     }
 
