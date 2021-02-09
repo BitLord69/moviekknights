@@ -311,4 +311,9 @@ public class MovieService {
     List<Movie> content = pages.getContent();
     return content;
   }
+
+  public List<Movie> getMoviesBySearch(String searchTerm) {
+    System.out.println("searchterm: " + searchTerm);
+    return movieRepo.findMoviesByTitleIsStartingWithIgnoreCase(searchTerm);
+  }
 }

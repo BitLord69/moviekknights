@@ -6,6 +6,7 @@ const movies = ref(null);
 const moviesByPagination = ref(null);
 const movieCount = ref(null);
 const movieError = ref(null);
+const moviesBySearch = ref(null);
 
 export default function MovieHelper(){
 
@@ -36,5 +37,15 @@ export default function MovieHelper(){
     }
   }
 
-  return { getMovies, getMovieCount, getMoviesByPagination, movies, movieCount, moviesByPagination, movieError }
+  async function getMoviesBySearch(searchTerm){
+    try {
+      moviesBySearch.value = await extFetch(url + "/search/" + searchTerm);
+    } catch (err) {
+      movieError.value = err;
+      return;
+    }
+  }
+
+  return { getMovies, getMovieCount, getMoviesByPagination, getMoviesBySearch,
+     movies, movieCount, moviesByPagination, movieError, moviesBySearch }
 }

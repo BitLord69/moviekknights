@@ -32,7 +32,8 @@ export default {
   name: "Movies",
   components: { Movie, MovieInfoModal, AutoComplete },
   setup(){
-    const { getMovieCount, movieCount, movieError, getMoviesByPagination, moviesByPagination } = MovieHelper();
+    const { getMovieCount, movieCount, movieError, getMoviesByPagination,
+     getMoviesBySearch, moviesByPagination, moviesBySearch } = MovieHelper();
     let state = reactive({
       first: 0,
       moviesOnPage: 18,
@@ -70,14 +71,17 @@ export default {
       state.selectedMovie = movie
     }
 
-    function searchMovie(event) {
+   async function searchMovie(event) {
+      console.log("event", event);
       if (!event.query.trim().length) {
         state.filteredMovies = moviesByPagination.value;
       }
       else {
-        state.filteredMovies = moviesByPagination.value.filter((movie) => {
-            return movie.title.toLowerCase().startsWith(event.query.toLowerCase());
-        });
+        // state.filteredMovies = moviesByPagination.value.filter((movie) => {
+        //     return movie.title.toLowerCase().startsWith(event.query.toLowerCase());
+        // });
+        await getMoviesBySearch(event.query);
+        state.filteredMovies = moviesBySearch.value;
       }
     }
 

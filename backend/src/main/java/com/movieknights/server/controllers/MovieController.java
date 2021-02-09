@@ -29,6 +29,12 @@ public class MovieController {
         return movie;
     }
 
+    @GetMapping("/search/{searchTerm}")
+    public List<Movie> searchMovies(@PathVariable String searchTerm) {
+        System.out.println("i searchmovies");
+        return movieService.getMoviesBySearch(searchTerm);
+    }
+
     @GetMapping("/count")
     public long getCountOfMoviesInDb() {
         return movieService.getCount();
