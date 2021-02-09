@@ -2,7 +2,8 @@ import authHeader from './auth-header';
 import UserHandler from './UserHandler';
 
 export async function extFetch(url, method, body, getFromProtectedPart = false) {
-  const { refreshToken } = UserHandler();
+  const { parseJwt, refreshToken } = UserHandler();
+
   if (url.startsWith('http://localhost/%27')) {
     console.warn("Do not fetch http://localhost:5050/rest/etc, just write: '/rest/etc'")
   }
@@ -21,7 +22,6 @@ export async function extFetch(url, method, body, getFromProtectedPart = false) 
       token = parseJwt(userUnpacked.accessToken)
       let time = Date.now()/1000;
       if(token.exp - time < 300){
-        console.log("Trying to get refresh(ed)!");
         await refreshToken();
       }
     }
@@ -45,11 +45,5 @@ export async function extFetch(url, method, body, getFromProtectedPart = false) 
     return false;
   }
 
-  function parseJwt(token){
-    try {
-      return JSON.parse(atob(token.split('.')[1]));
-    } catch (e) {
-      return null;
-    }
-  }
+  
 }
