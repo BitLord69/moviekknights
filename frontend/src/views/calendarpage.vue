@@ -25,23 +25,16 @@
 </template>
 
 <script>
-import {useRouter} from 'vue-router'
+
 import Event from '@/components/Event'
 import Calendar from "@/components/Calendar"
-import UserHandler from '@/modules/UserHandler'
 import EventHelper from '@/modules/EventHelper';
 
 export default {
   components: { Calendar, Event },
   setup() {
-    const router = useRouter();
-    const {isLoggedIn} = UserHandler();
     const { showEventForm, eventsToBook } = EventHelper();
     
-    if(!isLoggedIn.value) {
-      router.push("/")
-    }
-
     return { showEventForm, eventsToBook }
   },
 };
