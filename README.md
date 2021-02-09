@@ -38,20 +38,11 @@ Medlemmar:<br/>
 
 - In the neo4j console, add these constraints
   ```
-  CREATE CONSTRAINT ON (user:User)
-  ASSERT user.uuid IS UNIQUE;
-  CREATE CONSTRAINT ON (game:Game)
-  ASSERT game.uuid IS UNIQUE;
-  CREATE CONSTRAINT ON (league:League)
+  CREATE CONSTRAINT ON (m:MKMovie)
+  ASSERT m.uuid IS UNIQUE;
+  CREATE CONSTRAINT ON (m:MKPerson)
+  ASSERT m.uuid IS UNIQUE;
+  CREATE CONSTRAINT ON (m:MKGenre)
   ASSERT league.uuid IS UNIQUE;
 
-  CALL apoc.uuid.install('User')
-  YIELD label, installed
-  RETURN label, installed;
-  CALL apoc.uuid.install('Game')
-  YIELD label, installed
-  RETURN label, installed;
-  CALL apoc.uuid.install('League')
-  YIELD label, installed
-  RETURN label, installed
   ```
