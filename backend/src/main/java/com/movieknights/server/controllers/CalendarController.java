@@ -22,8 +22,10 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -48,32 +50,11 @@ public class CalendarController {
   UserDetailsServiceImpl userService;
 
   @GetMapping("/freebusy")
-  public ResponseEntity getFreeBusy() {
-    var authentication = SecurityContextHolder.getContext().getAuthentication();
-    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-    User user = userRepo.findById(userDetails.getUsername()).get();
-
+  public ResponseEntity<?> getFreeBusy() {
     List<User> users = userRepo.findAll();
-    DateTime dateMin = new DateTime(new Date());
-    DateTime dateMax = new DateTime(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7);
-    GoogleCredential credentials = null;
-    try {
-      credentials = new GoogleCredential.Builder().setTransport(GoogleNetHttpTransport.newTrustedTransport())
-              .setJsonFactory(JacksonFactory.getDefaultInstance())
-              .setClientSecrets(GOOGLE_ID, GOOGLE_SECRET)
-
-              .build();
-    } catch (GeneralSecurityException | IOException e) {
-      e.printStackTrace();
-    }
-    //new GoogleCredential().setAccessToken(user.getGoogleAccessToken());
-
-    Calendar calendar = new Calendar.Builder(
-            new NetHttpTransport(),
-            JacksonFactory.getDefaultInstance(),
-            credentials)
-            .setApplicationName("Movie Nights")
-            .build();
+    DateTime dateMin = new DateTime(String.valueOf(LocalDateTime.now().atOffset(ZoneOffset.ofHours(1)).withDayOfMonth(1).withSecond(0).withMinute(0).withHour(0)));
+    DateTime dateMax = new DateTime(String.valueOf(LocalDateTime.now().atOffset(ZoneOffset.ofHours(1)).with(TemporalAdjusters.lastDayOfMonth()).withSecond(59).withMinute(59).withHour(23)));
+    Calendar calendar = getGoogleCalendar();
 
     Calendar.Freebusy freebusy = calendar.freebusy();
     FreeBusyRequest freeBusyRequest = new FreeBusyRequest();
@@ -95,20 +76,37 @@ public class CalendarController {
               .execute();
     } catch (IOException e) {
       e.printStackTrace();
-      return new ResponseEntity("Error!!!!!!!! " + e, HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>("Error!!!!!!!! " + e, HttpStatus.BAD_REQUEST);
     }
     return ResponseEntity.ok(res);
   }
 
-  @PostMapping("/add")
-  public ResponseEntity addEvent(@RequestBody EventDTO eventDTO) {
-    List<User> users = userRepo.findAll();
-    var authentication = SecurityContextHolder.getContext().getAuthentication();
-    String username = authentication.getName();
-    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-    User user = userRepo.findById(userDetails.getUsername()).get();
+  @GetMapping("/personal")
+  public ResponseEntity<?> getPersonal() {
+    DateTime dateMin = new DateTime(String.valueOf(LocalDateTime.now().atOffset(ZoneOffset.ofHours(1)).withDayOfMonth(1).withSecond(0).withMinute(0).withHour(0)));
+    DateTime dateMax = new DateTime(String.valueOf(LocalDateTime.now().atOffset(ZoneOffset.ofHours(1)).with(TemporalAdjusters.lastDayOfMonth()).withSecond(59).withMinute(59).withHour(23)));
+    User user = getUser();
 
+    Events events = null;
+
+    Calendar calendar = getGoogleCalendar();
+    try {
+      events = calendar.events()
+          .list(user.getUsername())
+          .setTimeMin(dateMin)
+          .setTimeMax(dateMax)
+          .setKey(API_KEY)
+          .execute();
+    } catch (IOException e) {
+      e.printStackTrace();
+      return new ResponseEntity<>("Error!!!!!!!! " , HttpStatus.BAD_REQUEST);
+    }
+    return ResponseEntity.ok(events.getItems());
+  }
+
+  private Calendar getGoogleCalendar() {
     GoogleCredential credentials = null;
+
     try {
       credentials = new GoogleCredential.Builder().setTransport(GoogleNetHttpTransport.newTrustedTransport())
               .setJsonFactory(JacksonFactory.getDefaultInstance())
@@ -118,12 +116,19 @@ public class CalendarController {
       e.printStackTrace();
     }
 
-    Calendar calendar = new Calendar.Builder(
+    return new Calendar.Builder(
             new NetHttpTransport(),
             JacksonFactory.getDefaultInstance(),
             credentials)
             .setApplicationName("Movie Nights")
             .build();
+  }
+
+  @PostMapping("/add")
+  public ResponseEntity addEvent(@RequestBody EventDTO eventDTO) {
+    List<User> users = userRepo.findAll();
+    User user = getUser();
+    Calendar calendar = getGoogleCalendar();
 
     EventDateTime start = new EventDateTime();
     EventDateTime end = new EventDateTime();
@@ -133,7 +138,7 @@ public class CalendarController {
     List<EventAttendee> attendees = new ArrayList<>();
 
     for (User u : users) {
-      if (!u.getUsername().equals(username)) {
+      if (!u.getUsername().equals(user.getUsername())) {
         attendees.add(new EventAttendee().setEmail(u.getUsername()));
       }
     }
@@ -144,6 +149,12 @@ public class CalendarController {
       return new ResponseEntity("Error!!!!!!!! " + e, HttpStatus.BAD_REQUEST);
     }
     return ResponseEntity.ok("SUCCESS!!!" + event);
+  }
+
+  private User getUser() {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+    return userRepo.findById(userDetails.getUsername()).get();
   }
 }
 
