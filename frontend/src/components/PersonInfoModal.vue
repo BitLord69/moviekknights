@@ -33,7 +33,7 @@
             <hr />
 						<div class="list" v-if="movieListChosen != 'acting'">
 							<div v-for="(movie, index) in state.filmographyDC" :key="index">
-								{{movie.title}} ({{movie.date}})
+								<span>{{movie.title}}</span> <span v-if="movie.releaseDate != null">({{movie.releaseDate.slice(0, 4)}})</span>
 							</div>
 						</div>
 						<div class="list" v-if="movieListChosen == 'acting'">
@@ -49,25 +49,38 @@
 </template>
 
 <script>
-import { reactive } from 'vue';
+import { reactive, onMounted, watchEffect } from 'vue';
 import moment from 'moment';
+import PersonHelper from '@/modules/PersonHelper';
 export default {
   name: 'PersonInfoModal',
   props: {person: Object, movieListChosen: String, movies: Array},
   setup(props){
+    const { getMoviesDirectedByPerson, getMoviesComposedByPerson, getMoviesPersonActedIn, moviesDirectedBy, moviesComposedBy, moviesActedIn } = PersonHelper();
     const state = reactive({
       showMore: false,
       showMoreText: "[läs mer...]",
 			biography: props.person && props.person.biography.slice(0, 150) + "...",
 			filmographyA: [],
-			filmographyD: [],
-			filmographyC: [],
 			filmographyDC: [],
 		})
+
+    onMounted(async () => {
+      await getMoviesDirectedByPerson(props.person.id);
+      await getMoviesComposedByPerson(props.person.id);
+      await getMoviesPersonActedIn(props.person.id);
+    });
+
+    watchEffect(async () => {
+      if (moviesDirectedBy.value && moviesComposedBy.value) {
+			if(state.movieListChosen == "directing") state.filmographyDC = moviesDirectedBy.value;
+			else if(state.movieListChosen == "composing") state.filmographyDC = moviesComposedBy.value;
+      }
+      
+      if (moviesActedIn.value) getMoviesStarringPerson();
+    })
+
 		
-		getMoviesStarringPerson();
-		getMoviesDirectedByPerson();
-    getMoviesComposedByPerson();
     chooseMovieListToView(props.movieListChosen)
 
     function toggleShowText() {
@@ -78,36 +91,14 @@ export default {
 
     function chooseMovieListToView(list) {
 			state.movieListChosen = list;
-			if(list == "directing") state.filmographyDC = state.filmographyD;
-			else if(list == "composing") state.filmographyDC = state.filmographyC;
-		}
-
-    function getMoviesDirectedByPerson() {
-			props.movies.forEach(m => {
-        m.directors.forEach(p => {
-					if(p.id == props.person.id) {
-						state.filmographyD.push({title: m.title, date: m.releaseDate.slice(0, 4)})
-					}
-					
-        });
-			});
-			state.filmographyD = state.filmographyD.sort((a, b) => b.date - a.date)
-		}
-		
-		function getMoviesComposedByPerson() {
-			props.movies.forEach(m => {
-        m.composers.forEach(p => {
-					if(p.id == props.person.id) {
-						state.filmographyC.push({title: m.title, date: m.releaseDate.slice(0, 4)})
-					}
-					
-        });
-			});
-			state.filmographyC = state.filmographyC.sort((a, b) => b.date - a.date)
+			if(list == "directing") state.filmographyDC = moviesDirectedBy.value;
+			else if(list == "composing") state.filmographyDC = moviesComposedBy.value;
 		}
 		
 		function getMoviesStarringPerson() {
-			props.movies.forEach(m => {
+      console.log(moviesActedIn.value);
+      let temp = moviesActedIn.value;
+			temp.forEach(m => {
         m.cast.forEach(p => {
 					if(p.person.id == props.person.id) {
 						state.filmographyA.push({title: m.title, date: m.releaseDate.slice(0, 4), character: p.character})
@@ -115,7 +106,7 @@ export default {
 					
         });
 			});
-			state.filmographyA = state.filmographyA.sort((a, b) => b.date - a.date)
+			//state.filmographyA = state.filmographyA.sort((a, b) => b.date - a.date)
     }
 
     return { state, moment, toggleShowText, chooseMovieListToView }

@@ -18,7 +18,7 @@
         <Movie :movie="movie" v-for="(movie, index) in state.pagMovies" :key="index" @click="displayMovieInfo(movie)"/>
     </div>
         <MovieInfoModal v-if="state.showMovieInfo" :movie="state.selectedMovie"/>
-        <PersonInfoModal v-if="state.showPersonInfo" :person="state.selectedPerson" :movies="movies" :movieListChosen="state.movieListChosen" />
+        <PersonInfoModal v-if="state.showPersonInfo" :person="state.selectedPerson" :movies="state.pagMovies" :movieListChosen="state.movieListChosen" />
   </div>
 </template>
 
