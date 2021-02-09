@@ -2,7 +2,7 @@
   <div class="movies">
     <div>Antal filmer i db: {{movieCount}}</div>
     
-    <Paginator v-model:first="state.first" :rows="18" :totalRecords="movieCount" class="paginator"
+    <Paginator :rows="18" :totalRecords="movieCount" @page="onPage($event)" class="paginator"
       template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
       currentPageReportTemplate="({currentPage} av {totalPages})">
       <template #left>
@@ -15,7 +15,7 @@
     </Paginator>
     
     <div id="movie-page">
-        <Movie :movie="movie" v-for="(movie, index) in state.pagMovies && state.pagMovies.slice(state.first, state.first+18)" :key="index" @click="displayMovieInfo(movie)"/>
+        <Movie :movie="movie" v-for="(movie, index) in state.pagMovies" :key="index" @click="displayMovieInfo(movie)"/>
     </div>
         <MovieInfoModal v-if="state.showMovieInfo" :movie="state.selectedMovie"/>
   </div>
@@ -32,17 +32,18 @@ export default {
   name: "Movies",
   components: { Movie, MovieInfoModal, AutoComplete },
   setup(){
-    const { getMovies, getMovieCount, movies, movieCount, movieError } = MovieHelper();
+    const { getMovieCount, movieCount, movieError, getMoviesByPagination, moviesByPagination } = MovieHelper();
     let state = reactive({
       first: 0,
-      pagMovies: movies.value,
+      moviesOnPage: 18,
+      pagMovies: moviesByPagination,
       showMovieInfo: false,
       selectedMovie: null,
       searchTerm: '',
-      filteredMovies: movies.value,
+      filteredMovies: moviesByPagination.value,
     })
 
-    watchEffect(() => {
+    watchEffect(async () => {
       if (typeof state.searchTerm === 'object') {
         state.selectedMovie = state.searchTerm;
         state.showMovieInfo = true;
@@ -51,11 +52,17 @@ export default {
 
     onMounted(async () => {
       await getMovieCount();
-      await getMovies();
+      await getMoviesByPagination(0);
+      //await getMovies();
     })
 
     function reset() {
       state.first = 0;
+    }
+
+    async function onPage(event) {
+      await getMoviesByPagination(event.page);
+      state.pagMovies = moviesByPagination.value;
     }
 
     function displayMovieInfo(movie) {
@@ -65,16 +72,16 @@ export default {
 
     function searchMovie(event) {
       if (!event.query.trim().length) {
-        state.filteredMovies = movies.value;
+        state.filteredMovies = moviesByPagination.value;
       }
       else {
-        state.filteredMovies = movies.value.filter((movie) => {
+        state.filteredMovies = moviesByPagination.value.filter((movie) => {
             return movie.title.toLowerCase().startsWith(event.query.toLowerCase());
         });
       }
     }
 
-    return { state, movies, movieCount, movieError, displayMovieInfo, reset, searchMovie}
+    return { state, movieCount, movieError, displayMovieInfo, reset, searchMovie, onPage}
   }
 }
 </script>

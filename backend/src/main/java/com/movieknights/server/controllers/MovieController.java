@@ -39,7 +39,7 @@ public class MovieController {
         return movieService.getMoviesFromDb();
     }
 
-    @GetMapping("/page/{page]")
+    @GetMapping("/page/{page}")
     public List<Movie> getTheMoviesWithPagination(@PathVariable int page) {
         return movieService.getMoviesFromPagination(page);
     }
