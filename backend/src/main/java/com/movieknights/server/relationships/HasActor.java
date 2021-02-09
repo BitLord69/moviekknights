@@ -13,11 +13,9 @@ import org.springframework.data.neo4j.core.schema.TargetNode;
 @Data
 @RelationshipProperties
 public class HasActor {
-
     @TargetNode
     private Person person;
 
     private String character;
     private int order;
-
 }

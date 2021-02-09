@@ -1,17 +1,16 @@
 package com.movieknights.server.entities;
 
-import com.movieknights.server.relationships.HasActor;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.data.neo4j.core.schema.Id;
+import com.movieknights.server.relationships.HasActor;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 
 @Data
 @Node("MKMovie")
