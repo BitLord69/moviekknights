@@ -36,7 +36,7 @@ Medlemmar:<br/>
 - Make sure `dbms.directories.import` etc are not overriden by the defaults (duplicate entries)
 - Changing your config-file requires you to restart the neo4j-service
 
-- In the neo4j console, add these constraints
+- In the neo4j console, add these constraints (to see which constraints have been set, do a :schema in the Neo browser)
   ```
   CREATE CONSTRAINT ON (m:MKMovie)
   ASSERT m.uuid IS UNIQUE;
