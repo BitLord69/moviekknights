@@ -3,9 +3,20 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <Button @click="addEventToCalendar(movie)">Skapa event</Button>
+          <Button @click="toggleConfirmation">Skapa event</Button>
           <Button icon="pi pi-times" @click="$parent.state.showMovieInfo = false" />
         </div>
+      <Dialog header="Bekräfta" :visible="state.displayConfirmation" :style="{width: '350px'}" :modal="true">
+        <div class="confirmation-content">
+          <i class="pi pi-exclamation-triangle p-mr-3" style="font-size: 2rem" />
+          <span>Filmen har lagts till i dina bokningar. Vill du fortsätta till bokningen?</span>
+        </div>
+    <template #footer>
+        <Button label="Nej" icon="pi pi-times" @click="addEventToCalendar(movie);toggleConfirmation();" class="p-button-text"/>
+        <Button label="Ja" icon="pi pi-check" @click="addEventToCalendar(movie);toggleConfirmation(); router.push('/calendar')"
+         class="p-button-text" autofocus />
+    </template>
+      </Dialog>
         <div class="modal-body" :style="{backgroundImage: `url(${movie.backdropPath != null ? movie.backdropPath : '/img/noimagebackdrop.png'})`}">
           <div class="poster">
             <img :src="movie.posterPath != null ? movie.posterPath : '/img/noimage.png'" />
@@ -51,19 +62,27 @@
 
 <script>
 import { reactive } from 'vue';
+import { useRouter } from 'vue-router';
 import EventHelper from "@/modules/EventHelper"
 export default {
   name: 'MovieInfoModal',
   props: {movie: Object, showMovieInfo: Boolean},
   setup(props){
+
     const { addEventToCalendar } = EventHelper();
+    const router = useRouter();
     const state = reactive({
       showMore: false,
       showMoreText: "[läs mer...]",
       overview: props.movie && props.movie.overview.slice(0, 150) + "...",
       first: 0,
-      castCount: props.movie && props.movie.cast.length
+      castCount: props.movie && props.movie.cast.length,
+      displayConfirmation: false,
     })
+
+    function toggleConfirmation() {
+      state.displayConfirmation = !state.displayConfirmation;
+    }
 
     function toggleShowText() {
       state.showMore = !state.showMore
@@ -95,7 +114,7 @@ export default {
       }
     }
     
-    return { state, time, displayCast, toggleShowText, displayCastTest, addEventToCalendar }
+    return { state, time, displayCast, toggleShowText, displayCastTest, addEventToCalendar, toggleConfirmation, router }
   }
 }
 </script>

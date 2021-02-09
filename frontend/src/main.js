@@ -9,6 +9,9 @@ import PrimeVue from "primevue/config";
 import Paginator from 'primevue/paginator';
 import Button from 'primevue/button';
 import Toast from 'primevue/toast';
+import Dropdown from 'primevue/dropdown';
+import Calendar from 'primevue/calendar';
+import Dialog from 'primevue/dialog';
 
 import "primeflex/primeflex.css";
 import "primeicons/primeicons.css";
@@ -28,6 +31,9 @@ app.use(ToastService);
 app.component("Paginator", Paginator);
 app.component("Button", Button);
 app.component("Toast", Toast);
+app.component("Dropdown", Dropdown);
+app.component("PrimeCalendar", Calendar);
+app.component("Dialog", Dialog);
 
 app.mount('#app')
 
