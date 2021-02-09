@@ -52,7 +52,7 @@ public class DBUpdate implements Runnable {
   private void downloadMovies(long lastId) throws InterruptedException {
     ExecutorService pool = Executors.newFixedThreadPool(10);
 
-    for (long id = 1l; id < lastId; id++) { //Your ArrayList
+    for (long id = 1l; id <= lastId; id++) { //Your ArrayList
       pool.execute(new DownloadMovieTask(id, movieService));
     }
 
