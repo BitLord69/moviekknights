@@ -1,5 +1,6 @@
 <template>
   <div id="nav">
+    <Toast position="bottom-center" />
     <router-link to="/">Hem</router-link> |
     <router-link to="/movies">Filmer</router-link> |
     <router-link to="/about">Om tekniken</router-link> |
@@ -16,13 +17,23 @@
 <script>
 
 import UserHandler from "@/modules/UserHandler";
-export default {
+import { defineComponent, watchEffect } from "vue";
+import { useToast } from "primevue/usetoast";
+
+export default defineComponent({
  async setup() {
-  const { isLoggedIn, currentUser, startApp } = UserHandler();
+  const toast = useToast();
+  const { isLoggedIn, currentUser, startApp, showToast } = UserHandler();
+  watchEffect(() => {
+    if(showToast.value) {
+       toast.add({severity:'warn', summary: 'Sessionen har upphört', detail:'Vänligen logga in igen', life: 3000});
+       showToast.value = false;
+    }
+  })
   await startApp();
   return { isLoggedIn, currentUser }
   }
-}
+})
 </script>
 <style lang="scss" scoped>
 @import "@/styles/_variables.scss";

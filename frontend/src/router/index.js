@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "../views/startpage.vue";
+import UserHandler from '@/modules/UserHandler'
+const { isLoggedIn, isTokenValid, logout, showToast } = UserHandler();
 
 const routes = [
   {
@@ -37,6 +39,18 @@ const routes = [
     name: "Calendar",
     component: () =>
       import("../views/calendarpage.vue"),
+    beforeEnter: (to, from, next) => {
+      let token = isTokenValid();
+      if(isLoggedIn.value && token) {
+        next();
+      } else {
+        if(!token){
+          logout();
+          showToast.value = true;
+        }
+        next("/");
+      }
+    }
   },
 ];
 

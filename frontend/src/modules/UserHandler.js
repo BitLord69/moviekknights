@@ -9,6 +9,7 @@ const isLoggedIn = ref(null);
 const currentUser = ref(null);
 const auth2 = ref(null);
 const googleApi = ref(null);
+const showToast = ref(false);
 
 export default function UserHandler() {
 
@@ -103,15 +104,42 @@ export default function UserHandler() {
     }
   }
 
+  function parseJwt(token){
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function isTokenValid(){
+    let user = localStorage.getItem('user');
+    let token;
+    if (user) {
+      let userUnpacked = JSON.parse(user);
+      if (userUnpacked.accessToken) {
+        token = parseJwt(userUnpacked.accessToken)
+        let time = Date.now()/1000;
+        if(token.exp - time > 0){
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   return {
-    isLoggedIn,
-    loginError,
-    currentUser,
-    signInCallback,
-    userError,
-    startApp,
-    logout,
     auth2,
-    refreshToken
+    userError,
+    showToast,
+    loginError,
+    isLoggedIn,
+    currentUser,
+    logout,
+    parseJwt,
+    startApp,
+    refreshToken,
+    isTokenValid,
+    signInCallback,
   };
 }

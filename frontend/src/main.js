@@ -2,11 +2,13 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import VueGapi from "vue-gapi";
+import ToastService from 'primevue/toastservice';
 
 //Primevue
 import PrimeVue from "primevue/config";
 import Paginator from 'primevue/paginator';
 import Button from 'primevue/button';
+import Toast from 'primevue/toast';
 
 import "primeflex/primeflex.css";
 import "primeicons/primeicons.css";
@@ -22,8 +24,10 @@ app.use(VueGapi, {
 })
 app.use(PrimeVue, { ripple: true });
 app.use(router);
+app.use(ToastService);
 app.component("Paginator", Paginator);
 app.component("Button", Button);
+app.component("Toast", Toast);
 
 app.mount('#app')
 

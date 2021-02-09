@@ -12,19 +12,11 @@
 </template>
 
 <script>
-import {useRouter} from 'vue-router'
 import Calendar from "@/components/Calendar"
-import UserHandler from '@/modules/UserHandler'
 
 export default {
   components: { Calendar },
   setup() {
-    const router = useRouter();
-    const {isLoggedIn} = UserHandler();
-    
-    if(!isLoggedIn.value) {
-      router.push("/")
-    }
 
     return { }
   },
