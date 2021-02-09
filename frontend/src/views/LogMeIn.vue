@@ -8,6 +8,8 @@
 import UserHandler from "@/modules/UserHandler";
 
 export default {
+  name: "LogMeIn",
+
   setup() {
     const { signInCallback, auth2 } = UserHandler();
 

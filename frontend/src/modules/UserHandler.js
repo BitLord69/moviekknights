@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import { extFetch } from "./extFetch";
 import { useRouter } from "vue-router";
+import authHeader from './auth-header';
 
 const loginError = ref(null);
 const userError = ref(null);
@@ -40,6 +41,27 @@ export default function UserHandler() {
       currentUser.value = null;
       loginError.value = "Bad username and/or password!";
     }
+  } 
+
+  async function refreshToken() {
+     
+      let headers = { 'content-type': 'application/json' };
+      let h2 = authHeader();
+      headers = { ...headers, ...h2 };
+      
+      try {
+        let response = await fetch("/api/auth/refreshtoken", {
+          headers: headers,
+        });
+        let result = await response.json();
+      
+        if (result.accessToken) {
+          localStorage.setItem("user", JSON.stringify(result));
+        }
+        
+      } catch (e) {
+        console.log("extFetch catch....", e)
+      }
   }
 
   function logout() {
@@ -90,5 +112,6 @@ export default function UserHandler() {
     startApp,
     logout,
     auth2,
+    refreshToken
   };
 }
