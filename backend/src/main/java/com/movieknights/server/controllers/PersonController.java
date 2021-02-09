@@ -24,10 +24,10 @@ public class PersonController {
     return personService.getAllPeople();
   }
 
-  @GetMapping("/{id}")
-  public Optional<PersonMovie> getPersonById(@PathVariable long id) {
-    return personService.getPersonById(id);
-  }
+//  @GetMapping("/{id}")
+//  public Optional<PersonMovie> getPersonById(@PathVariable long id) {
+//    return personService.getPersonById(id);
+//  }
 
   @GetMapping("/count")
   public long getCountOfPeopleInDb() {

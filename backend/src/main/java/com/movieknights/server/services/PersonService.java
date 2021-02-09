@@ -1,26 +1,23 @@
 package com.movieknights.server.services;
 
 import com.movieknights.server.entities.Person;
-import com.movieknights.server.entities.PersonMovie;
-import com.movieknights.server.repos.PersonMovieRepo;
 import com.movieknights.server.repos.PersonRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PersonService {
   @Autowired
   private PersonRepo personRepo;
 
-  @Autowired
-  private PersonMovieRepo personMovieRepo;
+//  @Autowired
+//  private PersonMovieRepo personMovieRepo;
 
-  public Optional<PersonMovie> getPersonById(long id) {
-    return personMovieRepo.findById(id);
-  }
+//  public Optional<PersonMovie> getPersonById(long id) {
+//    return personMovieRepo.findById(id);
+//  }
 
   public List<Person> getAllPeople() {
     return null;

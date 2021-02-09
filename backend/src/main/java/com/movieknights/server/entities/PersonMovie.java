@@ -12,24 +12,24 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 import java.util.Date;
 import java.util.HashSet;
 
-@Data
-@Node("MKPerson")
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
+//@Data
+//@Node("MKPerson")
+//@NoArgsConstructor
+//@AllArgsConstructor
+//@ToString
 public class PersonMovie {
-    @Id
-    private long id;
-
-    private Date dob;
-    private Date dod;
-    private String name;
-    private String profileImgPath;
-    private String biography;
-    private String homepage;
-    private String imdbId;
-    private int gender;
-    private boolean adult;
-    @Relationship(type = "HAS_ACTOR", direction = Relationship.Direction.INCOMING)
-    private HashSet<Movie> movies;
+//    @Id
+//    private long id;
+//
+//    private Date dob;
+//    private Date dod;
+//    private String name;
+//    private String profileImgPath;
+//    private String biography;
+//    private String homepage;
+//    private String imdbId;
+//    private int gender;
+//    private boolean adult;
+//    @Relationship(type = "HAS_ACTOR", direction = Relationship.Direction.INCOMING)
+//    private HashSet<Movie> movies;
 }
