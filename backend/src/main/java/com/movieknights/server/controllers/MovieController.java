@@ -29,6 +29,12 @@ public class MovieController {
         return movie;
     }
 
+    @GetMapping("/search/{searchTerm}")
+    public List<Movie> searchMovies(@PathVariable String searchTerm) {
+        System.out.println("i searchmovies");
+        return movieService.getMoviesBySearch(searchTerm);
+    }
+
     @GetMapping("/count")
     public long getCountOfMoviesInDb() {
         return movieService.getCount();
@@ -37,5 +43,10 @@ public class MovieController {
     @GetMapping("/db")
     public List<Movie> getTheMoviesFromDb() {
         return movieService.getMoviesFromDb();
+    }
+
+    @GetMapping("/page/{page}")
+    public List<Movie> getTheMoviesWithPagination(@PathVariable int page) {
+        return movieService.getMoviesFromPagination(page);
     }
 }

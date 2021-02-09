@@ -1,6 +1,9 @@
 import authHeader from './auth-header';
+import UserHandler from './UserHandler';
 
 export async function extFetch(url, method, body, getFromProtectedPart = false) {
+  const { parseJwt, refreshToken } = UserHandler();
+
   if (url.startsWith('http://localhost/%27')) {
     console.warn("Do not fetch http://localhost:5050/rest/etc, just write: '/rest/etc'")
   }
@@ -11,6 +14,18 @@ export async function extFetch(url, method, body, getFromProtectedPart = false) 
     headers = { ...headers, ...h2 };
   }
 
+  let user = localStorage.getItem('user');
+  let token;
+  if (user) {
+    let userUnpacked = JSON.parse(user);
+    if (userUnpacked.accessToken) {
+      token = parseJwt(userUnpacked.accessToken)
+      let time = Date.now()/1000;
+      if(token.exp - time < 300){
+        await refreshToken();
+      }
+    }
+  }
   try {
     let result = await fetch(url, {
       method,
@@ -29,4 +44,6 @@ export async function extFetch(url, method, body, getFromProtectedPart = false) 
     console.log("extFetch catch....")
     return false;
   }
+
+  
 }

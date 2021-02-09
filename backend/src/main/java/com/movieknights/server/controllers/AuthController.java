@@ -1,8 +1,6 @@
 package com.movieknights.server.controllers;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.movieknights.server.entities.User;
@@ -22,10 +20,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("api/auth")
+@SuppressWarnings("deprecation")
 public class AuthController {
   @Value("${api.google.client_id}")
   private String CLIENT_ID;
@@ -45,11 +45,10 @@ public class AuthController {
   @Autowired
   JwtUtils jwtUtils;
 
-
   @Autowired
   UserDetailsServiceImpl userService;
 
-  @RequestMapping(value = "/storeauthcode", method = RequestMethod.POST)
+  @PostMapping("/storeauthcode")
   public ResponseEntity storeauthcode(@RequestBody String code, @RequestHeader("X-Requested-With") String encoding) {
     if (encoding == null || encoding.isEmpty()) {
       // Without the `X-Requested-With` header, this request could be forged. Aborts.
@@ -96,6 +95,24 @@ public class AuthController {
     return ResponseEntity.ok(userRepo.findById(username).get());
   }
 
+  @GetMapping("/refreshtoken")
+  public ResponseEntity<?> refreshTokens() {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null) {
+      System.out.println("whoami authentication is null");
+      return ResponseEntity.ok(new NotLoggedInError());
+    }
+    User user = userRepo.findById(authentication.getName()).get();
+    String jwt = jwtUtils.generateJwtToken(authentication);
+
+    GoogleCredential cred =  getRefreshedCredentials(user.getRefreshToken());
+    assert cred != null;
+    user.setGoogleAccessToken(cred.getAccessToken());
+    userRepo.save(user);
+
+    return ResponseEntity.ok(new JwtResponse(jwt, user.getUsername(), user.getGoogleAccessToken(), authentication.getAuthorities()));
+  }
+
   private ResponseEntity<JwtResponse> authenticateUser(User user) {
     System.out.println("username: " + user.getUsername() + ", password:" + user.getPassword());
 
@@ -140,5 +157,18 @@ public class AuthController {
     user.setPictureUrl((String)payload.get("picture"));
 
     return userRepo.save(user);
+  }
+
+  private GoogleCredential getRefreshedCredentials(String refreshCode) {
+    try {
+      GoogleTokenResponse response = new GoogleRefreshTokenRequest(
+          new NetHttpTransport(), JacksonFactory.getDefaultInstance(), refreshCode, CLIENT_ID, CLIENT_SECRET )
+          .execute();
+      return new GoogleCredential().setAccessToken(response.getAccessToken());
+    }
+    catch( Exception ex ){
+      ex.printStackTrace();
+      return null;
+    }
   }
 }

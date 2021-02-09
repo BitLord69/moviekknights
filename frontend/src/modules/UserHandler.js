@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import { extFetch } from "./extFetch";
 import { useRouter } from "vue-router";
+import authHeader from './auth-header';
 
 const loginError = ref(null);
 const userError = ref(null);
@@ -8,6 +9,7 @@ const isLoggedIn = ref(null);
 const currentUser = ref(null);
 const auth2 = ref(null);
 const googleApi = ref(null);
+const showToast = ref(false);
 
 export default function UserHandler() {
 
@@ -40,6 +42,27 @@ export default function UserHandler() {
       currentUser.value = null;
       loginError.value = "Bad username and/or password!";
     }
+  } 
+
+  async function refreshToken() {
+     
+      let headers = { 'content-type': 'application/json' };
+      let h2 = authHeader();
+      headers = { ...headers, ...h2 };
+      
+      try {
+        let response = await fetch("/api/auth/refreshtoken", {
+          headers: headers,
+        });
+        let result = await response.json();
+      
+        if (result.accessToken) {
+          localStorage.setItem("user", JSON.stringify(result));
+        }
+        
+      } catch (e) {
+        console.log("extFetch catch....", e)
+      }
   }
 
   function logout() {
@@ -81,14 +104,42 @@ export default function UserHandler() {
     }
   }
 
+  function parseJwt(token){
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function isTokenValid(){
+    let user = localStorage.getItem('user');
+    let token;
+    if (user) {
+      let userUnpacked = JSON.parse(user);
+      if (userUnpacked.accessToken) {
+        token = parseJwt(userUnpacked.accessToken)
+        let time = Date.now()/1000;
+        if(token.exp - time > 0){
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   return {
-    isLoggedIn,
-    loginError,
-    currentUser,
-    signInCallback,
-    userError,
-    startApp,
-    logout,
     auth2,
+    userError,
+    showToast,
+    loginError,
+    isLoggedIn,
+    currentUser,
+    logout,
+    parseJwt,
+    startApp,
+    refreshToken,
+    isTokenValid,
+    signInCallback,
   };
 }

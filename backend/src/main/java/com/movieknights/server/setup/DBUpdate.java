@@ -5,7 +5,6 @@ import com.movieknights.server.entities.DBSetting;
 import com.movieknights.server.entities.LastLineDTO;
 import com.movieknights.server.repos.DBSettingRepo;
 import com.movieknights.server.services.MovieService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -52,7 +51,7 @@ public class DBUpdate implements Runnable {
   private void downloadMovies(long lastId) throws InterruptedException {
     ExecutorService pool = Executors.newFixedThreadPool(10);
 
-    for (long id = 1l; id < lastId; id++) { //Your ArrayList
+    for (long id = 1l; id <= lastId; id++) { //Your ArrayList
       pool.execute(new DownloadMovieTask(id, movieService));
     }
 
