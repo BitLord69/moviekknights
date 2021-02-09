@@ -43,6 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.POST,"/rest/calendar/add").authenticated()
         .antMatchers("/api/auth/whoami").permitAll()
         .antMatchers("/api/auth/storeauthcode").permitAll()
+        .antMatchers("/api/auth/refreshtoken").permitAll()
         .antMatchers( "/").permitAll()
         .antMatchers(HttpMethod.GET, "/rest/movies/*").permitAll()
         .anyRequest().authenticated();

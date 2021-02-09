@@ -5,7 +5,6 @@ import com.movieknights.server.entities.DBSetting;
 import com.movieknights.server.entities.LastLineDTO;
 import com.movieknights.server.repos.DBSettingRepo;
 import com.movieknights.server.services.MovieService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;

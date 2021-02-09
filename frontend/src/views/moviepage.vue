@@ -50,8 +50,8 @@ export default {
     })
 
     onMounted(async () => {
-      await getMovies();
       await getMovieCount();
+      await getMovies();
     })
 
     function reset() {
