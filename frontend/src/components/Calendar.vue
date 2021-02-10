@@ -1,5 +1,5 @@
 <template>
-  <div v-if="events && events.length > 0" class="calendar">
+  <div class="calendar">
 		<div class="p-grid p-jc-center p-ai-center">
 			<h3 class="p-m-0 p-col-3">Visa privat kalender: </h3>
 			<InputSwitch class="p-col-1" v-model="isPrivate"/>
@@ -17,12 +17,11 @@
     </template>
       </Dialog>
   </div>
-	<div v-else><h1>Här var det tomt...</h1></div>
 </template>
 
 <script>
 import { extFetch } from "@/modules/extFetch";
-import { ref, reactive, watchEffect } from "vue";
+import { ref, reactive, watchEffect, watch } from "vue";
 import FullCalendar from 'primevue/fullcalendar';
 import InputSwitch from 'primevue/inputswitch';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -31,6 +30,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import svLocale from '@fullcalendar/core/locales/sv'
 import UserHandler from '@/modules/UserHandler';
 import EventHelper from '@/modules/EventHelper';
+import moment from "moment";
 
 export default {
 components: { FullCalendar, InputSwitch },
@@ -41,14 +41,19 @@ components: { FullCalendar, InputSwitch },
 		const result = ref(null);
 		const refreshKey = ref(0);
 		const isPrivate = ref(false);
+		let startOfMonth = ref(moment().startOf('month').format("yyyy-MM-DDTHH:mm:ss"));
+		let endOfMonth = ref(moment().endOf('month').format("yyyy-MM-DDTHH:mm:ss"));
 
     let state = reactive({
 			showRemoveDialog: false,
 			eventToRemove: null,
-			updateCalendar: 0,
+			dates: {
+				start: startOfMonth.value,
+				end: endOfMonth.value,
+			},
       options: {
 				plugins:[dayGridPlugin, timeGridPlugin, interactionPlugin],
-				initialDate: '2021-02-01',
+				initialDate: startOfMonth,
 				headerToolbar: {
 					left: 'prev,next,today',
 					center: 'title',
@@ -73,9 +78,13 @@ components: { FullCalendar, InputSwitch },
 						console.log(e.event._def);
 					}
 				},
-				datesSet: (e) => {
+				/* datesSet: async (e) => {
 					console.log("Tjosan hejsan, e:", e);
-				}
+					startOfMonth.value = e.startStr;
+					endOfMonth.value = e.endStr;
+					await getFreeBusy()
+					console.log("EVENTS I datesSet: ", events);
+				} */
       },
 		})
 		
@@ -85,17 +94,16 @@ components: { FullCalendar, InputSwitch },
 			} else {
 				await getFreeBusy();
 			}
-			refreshKey.value++;
+			//refreshKey.value++;
 		});
-
-		await getFreeBusy();
-
-		function ourClicker() {
-			console.log('Tjosan hejsan!!!');
-		}
+		// eslint-disable-next-line
+		watch(startOfMonth, (cur, prev) => {
+			console.log("WATCHERN!\n", cur, " \n", prev);
+			refreshKey.value++;
+		}) 
 
 		async function getFreeBusy() {
-			result.value = await extFetch("/rest/calendar/freebusy", "GET", undefined, true);
+			result.value = await extFetch("/rest/calendar/freebusy/" + startOfMonth.value + "/" + endOfMonth.value, "GET", undefined, true);
 			events.length = 0;
 			state.options.editable = false;
 			Object.entries(result.value.calendars).forEach((calendar) => {
@@ -145,7 +153,7 @@ components: { FullCalendar, InputSwitch },
 		refreshKey.value++;
 	}
 
-    return { state, result, isLoggedIn, createEvent, events, event, isPrivate, refreshKey, doRemoveEvent, ourClicker };
+    return { state, result, isLoggedIn, createEvent, events, event, isPrivate, refreshKey, doRemoveEvent };
   }
 }
 </script>
