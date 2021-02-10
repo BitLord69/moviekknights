@@ -1,10 +1,10 @@
 <template>
   <div v-if="events && events.length > 0" class="calendar">
-		<div class="p-grid p-jc-center">
+		<div class="p-grid p-jc-center p-ai-center">
 			<h3 class="p-m-0 p-col-3">Visa privat kalender: </h3>
 			<InputSwitch class="p-col-1" v-model="isPrivate"/>
 		</div>
-		<FullCalendar :events="events" :options="state.options" :key="refreshKey"/>
+		<FullCalendar :events="events" :options="state.options" :key="refreshKey" />
 		<Dialog header="Radera evenemang?" :visible="state.showRemoveDialog" :style="{width: '350px'}" :modal="true">
         <div class="confirmation-content">
           <i class="pi pi-exclamation-triangle p-mr-3" style="font-size: 2rem" />
@@ -12,7 +12,7 @@
         </div>
     <template #footer>
         <Button label="Nej" icon="pi pi-times" @click="state.showRemoveDialog = !state.showRemoveDialog;" class="p-button-text"/>
-        <Button label="Ja" icon="pi pi-check" @click="removeEvent(state.eventToRemove); state.showRemoveDialog = !state.showRemoveDialog;"
+        <Button label="Ja" icon="pi pi-check" @click="doRemoveEvent"
          class="p-button-text" autofocus />
     </template>
       </Dialog>
@@ -50,9 +50,9 @@ components: { FullCalendar, InputSwitch },
 				plugins:[dayGridPlugin, timeGridPlugin, interactionPlugin],
 				initialDate: '2021-02-01',
 				headerToolbar: {
-					left: 'prev,next',
+					left: 'prev,next,today',
 					center: 'title',
-					right: 'dayGridMonth,timeGridWeek,timeGridDay'
+					right: 'dayGridMonth,timeGridWeek,timeGridDay',
 				},
 				editable: false,
 				handleWindowResize: true,
@@ -72,6 +72,9 @@ components: { FullCalendar, InputSwitch },
 						state.showRemoveDialog = true;
 						console.log(e.event._def);
 					}
+				},
+				datesSet: (e) => {
+					console.log("Tjosan hejsan, e:", e);
 				}
       },
 		})
@@ -86,6 +89,10 @@ components: { FullCalendar, InputSwitch },
 		});
 
 		await getFreeBusy();
+
+		function ourClicker() {
+			console.log('Tjosan hejsan!!!');
+		}
 
 		async function getFreeBusy() {
 			result.value = await extFetch("/rest/calendar/freebusy", "GET", undefined, true);
@@ -120,6 +127,7 @@ components: { FullCalendar, InputSwitch },
 						start: start,
 						end: end,
 						editable: true,
+						classNames:'text-class',
 					});
 				}
 			});
@@ -130,7 +138,14 @@ components: { FullCalendar, InputSwitch },
 			event.id = null;
 		}
 		
-    return { state, result, isLoggedIn, createEvent, events, event, isPrivate, refreshKey, removeEvent };
+	async function doRemoveEvent() {
+		removeEvent(state.eventToRemove);
+		state.showRemoveDialog = !state.showRemoveDialog;
+		await getPersonal();
+		refreshKey.value++;
+	}
+
+    return { state, result, isLoggedIn, createEvent, events, event, isPrivate, refreshKey, doRemoveEvent, ourClicker };
   }
 }
 </script>
@@ -145,5 +160,29 @@ components: { FullCalendar, InputSwitch },
 
 	.p-inputswitch-slider {
 		background: $bg-primary;
+	}
+
+	::v-deep(.fc-header-toolbar){
+		.fc-toolbar-chunk:first-child {
+			width:33%;
+			margin-right: 0 !important;
+		}
+
+		.fc-toolbar-chunk:last-child {
+			width:33%;
+			display: flex;
+			justify-content: flex-end;
+			margin-left: 0 !important;
+		}
+	}
+
+	::v-deep(.fc-event), ::v-deep(.fc-event-main) {
+		color: $text-secondary !important;
+		border: $border-primary !important;
+		background-color: $bg-secondary !important;
+	}
+
+	::v-deep(.fc-daygrid-day.fc-day-today) {
+		background-color: lighten($bg-secondary, 5%);
 	}
 </style>
