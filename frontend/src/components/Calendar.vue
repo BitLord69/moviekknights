@@ -2,7 +2,7 @@
   <div v-if="events && events.length > 0" class="calendar">
 		<h3>Visa privat kalender</h3>
 		<InputSwitch v-model="isPrivate" class="p-mb-4" @click="onClick"/>
-		<FullCalendar :events="events" :options="state.options" ref="calendarView" />
+		<FullCalendar :events="events" :options="state.options" :key="refreshKey"/>
   </div>
 	<div v-else><h1>Här var det tomt...</h1></div>
 </template>
@@ -22,13 +22,12 @@ import EventHelper from '@/modules/EventHelper';
 export default {
 components: { FullCalendar, InputSwitch },
   async setup() {
-		const { event, events, createEvent } = EventHelper();
 		const {isLoggedIn} = UserHandler();
+		const { event, events, createEvent } = EventHelper();
+
 		const result = ref(null);
-
-		const calendarView = ref(null);
-
-		const isPrivate = ref(null);
+		const refreshKey = ref(0);
+		const isPrivate = ref(false);
 	
     let state = reactive({
 			updateCalendar: 0,
@@ -61,9 +60,7 @@ components: { FullCalendar, InputSwitch },
 			} else {
 				await getFreeBusy();
 			}
-			calendarView.value.$emit('refetch-events');
-			console.log("isPrivate:", isPrivate.value);
-			console.log("watchEffect - calendarView.value:", calendarView.value);
+			refreshKey.value++;
 		});
 
 		await getFreeBusy();
@@ -89,12 +86,13 @@ components: { FullCalendar, InputSwitch },
 		async function getPersonal() {
 			result.value = await extFetch("/rest/calendar/personal", "GET", undefined, true);
 			events.length = 0;
+			// privateEvents.length = 0;
 			result.value.forEach(event => {
 				if (event.status !== 'cancelled') {
 					let start = new Date(JSON.parse(JSON.stringify(event.start)).dateTime.value).toLocaleString();				
-					let end = new Date(JSON.parse(JSON.stringify(event.end)).dateTime.value).toLocaleString();				
+					let end = new Date(JSON.parse(JSON.stringify(event.end)).dateTime.value).toLocaleString();
 					events.push({
-						id: events.length + 1, //event.id,
+						id: event.id,
 						title: event.summary,
 						start: start,
 						end: end,
@@ -113,7 +111,7 @@ components: { FullCalendar, InputSwitch },
 
 		}
 
-    return { state, result, isLoggedIn, createEvent, events, event, isPrivate, onClick, calendarView };
+    return { state, result, isLoggedIn, createEvent, events, event, isPrivate, onClick, refreshKey };
   }
 }
 </script>
