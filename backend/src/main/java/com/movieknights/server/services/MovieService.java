@@ -9,6 +9,8 @@ import com.movieknights.server.repos.PersonRepo;
 import com.movieknights.server.utils.TextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -302,5 +304,15 @@ public class MovieService {
 
   public List<Movie> getMoviesFromDb() {
     return movieRepo.findAll(Sort.by(Sort.Direction.DESC, "movieId"));
+  }
+
+  public List<Movie> getMoviesFromPagination(int page) {
+    Page<Movie> pages = movieRepo.findAll(PageRequest.of(page, 18));
+    List<Movie> content = pages.getContent();
+    return content;
+  }
+
+  public List<Movie> getMoviesBySearch(String searchTerm) {
+    return movieRepo.findTop50ByTitleIsStartingWithIgnoreCase(searchTerm);
   }
 }
