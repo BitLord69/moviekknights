@@ -106,6 +106,7 @@ public class CalendarController {
 
   private Calendar getGoogleCalendar() {
     GoogleCredential credentials = null;
+
     try {
       credentials = new GoogleCredential.Builder().setTransport(GoogleNetHttpTransport.newTrustedTransport())
               .setJsonFactory(JacksonFactory.getDefaultInstance())
@@ -124,7 +125,7 @@ public class CalendarController {
   }
 
   @PostMapping("/add")
-  public ResponseEntity<?> addEvent(@RequestBody EventDTO eventDTO) {
+  public ResponseEntity addEvent(@RequestBody EventDTO eventDTO) {
     List<User> users = userRepo.findAll();
     User user = getUser();
     Calendar calendar = getGoogleCalendar();
@@ -145,23 +146,9 @@ public class CalendarController {
     try {
       event = calendar.events().insert(user.getUsername(), event).setOauthToken(user.getGoogleAccessToken()).setKey(API_KEY).execute();
     } catch (IOException e) {
-      return new ResponseEntity<>("Error!!!!!!!! " + e, HttpStatus.BAD_REQUEST);
+      return new ResponseEntity("Error!!!!!!!! " + e, HttpStatus.BAD_REQUEST);
     }
     return ResponseEntity.ok("SUCCESS!!!" + event);
-  }
-
-  @DeleteMapping("/delete/{id}")
-  public ResponseEntity<?> deleteEvent(@PathVariable String id){
-    System.out.println("In DELETE_EVENT: " + id);
-    User user = getUser();
-    Calendar calendar = getGoogleCalendar();
-
-    try {
-      calendar.events().delete(user.getUsername(), id).setOauthToken(user.getGoogleAccessToken()).setKey(API_KEY).execute();
-    } catch (IOException e) {
-      return new ResponseEntity<>("Unable to remove event!" + e, HttpStatus.BAD_REQUEST);
-    }
-    return ResponseEntity.ok("Event successfully removed!");
   }
 
   private User getUser() {

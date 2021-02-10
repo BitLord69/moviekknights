@@ -33,15 +33,7 @@ export default function EventHelper(){
     newEvent.end = newDate;
     await extFetch("rest/calendar/add", "POST", newEvent, true)
     event.booked = true;
-    let index = eventsToBook.indexOf(newEvent);
-    eventsToBook.splice(index, 1);
   }
 
-  async function removeEvent(eventToRemove) {
-    await extFetch("rest/calendar/delete/" + eventToRemove, "DELETE", undefined, true)
-  }
-
-
-
-  return { event, events, eventsToBook, showEventForm, addEventToCalendar, createEvent, removeEvent }
+  return { event, events, eventsToBook, showEventForm, addEventToCalendar, createEvent }
 }
