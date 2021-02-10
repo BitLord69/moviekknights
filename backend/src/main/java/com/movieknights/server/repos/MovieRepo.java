@@ -13,7 +13,7 @@ import java.util.List;
 
 @Repository
 public interface MovieRepo extends Neo4jRepository<Movie, Long> {
-    List<Movie> findMoviesByTitleIsStartingWithIgnoreCase(String searchterm);
+    List<Movie> findTop50ByTitleIsStartingWithIgnoreCase(String searchterm);
 
     @Query("MATCH (m:MKMovie)-[r:HAS_DIRECTOR]-(p:MKPerson{id: $id}) RETURN m ORDER BY m.releaseDate DESC")
     List<Movie> findAllMoviesFromDirector(long id);
