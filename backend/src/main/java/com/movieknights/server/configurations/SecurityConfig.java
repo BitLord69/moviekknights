@@ -46,6 +46,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/api/auth/refreshtoken").authenticated()
         .antMatchers( "/").permitAll()
         .antMatchers(HttpMethod.GET, "/rest/movies/*").permitAll()
+        .antMatchers(HttpMethod.GET, "/rest/movies/page/*").permitAll()
+        .antMatchers(HttpMethod.GET, "/rest/movies/search/*").permitAll()
         .anyRequest().authenticated();
 
     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
