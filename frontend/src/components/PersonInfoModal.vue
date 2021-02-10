@@ -33,12 +33,12 @@
             <hr />
 						<div class="list" v-if="movieListChosen != 'acting'">
 							<div v-for="(movie, index) in state.filmographyDC" :key="index">
-								<span>{{movie.title}}</span> <span v-if="movie.releaseDate != null">({{movie.releaseDate.slice(0, 4)}})</span>
+								{{movie.title}} <span v-if="movie.releaseDate != null">({{movie.releaseDate.slice(0, 4)}})</span>
 							</div>
 						</div>
 						<div class="list" v-if="movieListChosen == 'acting'">
 							<div v-for="(movie, index) in state.filmographyA" :key="index">
-								{{movie.title}} ({{movie.date}}) - {{movie.character}}
+								{{movie.title}} <span v-if="movie.date != null">({{movie.date.slice(0, 4)}})</span> - {{movie.character}}
 							</div>
 						</div>
           </div>
@@ -77,7 +77,7 @@ export default {
 			else if(state.movieListChosen == "composing") state.filmographyDC = moviesComposedBy.value;
       }
       
-      if (moviesActedIn.value) getMoviesStarringPerson();
+      if (moviesActedIn.value && moviesActedIn.value.length > 0) getMoviesStarringPerson();
     })
 
 		
@@ -96,12 +96,14 @@ export default {
 		}
 		
 		function getMoviesStarringPerson() {
-      console.log(moviesActedIn.value);
+      console.log("moviesActedIn: ", moviesActedIn.value);
       let temp = moviesActedIn.value;
+      console.log("temp: ", temp);
 			temp.forEach(m => {
+        console.log("film: ", m);
         m.cast.forEach(p => {
 					if(p.person.id == props.person.id) {
-						state.filmographyA.push({title: m.title, date: m.releaseDate.slice(0, 4), character: p.character})
+						state.filmographyA.push({title: m.title, date: m.releaseDate, character: p.character})
 					}
 					
         });

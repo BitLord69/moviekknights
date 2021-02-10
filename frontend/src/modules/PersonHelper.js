@@ -29,7 +29,7 @@ export default function PersonHelper(){
 
   async function getMoviesPersonActedIn(id){
     try {
-        moviesActedIn.value = await extFetch(url + "/composer/" + id);
+        moviesActedIn.value = await extFetch(url + "/actor/" + id);
     } catch (err) {
         personError.value = err;
       return;
