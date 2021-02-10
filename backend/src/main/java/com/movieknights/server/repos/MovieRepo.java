@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface MovieRepo extends Neo4jRepository<Movie, Long> {
-    List<Movie> findMoviesByTitleIsStartingWithIgnoreCase(String searchterm);
+    List<Movie> findTop50ByTitleIsStartingWithIgnoreCase(String searchterm);
 }

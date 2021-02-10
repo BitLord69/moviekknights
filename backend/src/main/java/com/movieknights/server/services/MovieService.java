@@ -313,7 +313,6 @@ public class MovieService {
   }
 
   public List<Movie> getMoviesBySearch(String searchTerm) {
-    System.out.println("searchterm: " + searchTerm);
-    return movieRepo.findMoviesByTitleIsStartingWithIgnoreCase(searchTerm);
+    return movieRepo.findTop50ByTitleIsStartingWithIgnoreCase(searchTerm);
   }
 }
