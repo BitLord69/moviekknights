@@ -140,7 +140,7 @@ export default {
   font-size: 1.2rem;
   width: 2rem;
   height: 2rem;
-  top: 20px;
+  top: 35px;
   right: 25px;
   cursor: pointer;
   color: $text-secondary;
