@@ -308,8 +308,7 @@ public class MovieService {
 
   public List<Movie> getMoviesFromPagination(int page) {
     Page<Movie> pages = movieRepo.findAll(PageRequest.of(page, 18));
-    List<Movie> content = pages.getContent();
-    return content;
+    return pages.getContent();
   }
 
   public List<Movie> getMoviesBySearch(String searchTerm) {

@@ -1,0 +1,26 @@
+2021-02-10 11:35:34.284  INFO 9140 --- [main] c.m.server.MovieknightsApplication       : Starting MovieknightsApplication using Java 15.0.2 on Carl-Eve with PID 9140 (C:\Users\carli\Desktop\Programmering\web-services\movieknights\backend\target\classes started by carli in C:\Users\carli\Desktop\Programmering\web-services\movieknights\backend)
+2021-02-10 11:35:34.287  INFO 9140 --- [main] c.m.server.MovieknightsApplication       : No active profile set, falling back to default profiles: default
+2021-02-10 11:35:35.440  INFO 9140 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Neo4j repositories in DEFAULT mode.
+2021-02-10 11:35:35.584  INFO 9140 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 137 ms. Found 0 Neo4j repository interfaces.
+2021-02-10 11:35:35.593  INFO 9140 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Neo4j repositories in DEFAULT mode.
+2021-02-10 11:35:35.638  INFO 9140 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 44 ms. Found 5 Neo4j repository interfaces.
+2021-02-10 11:35:36.306  INFO 9140 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 5050 (http)
+2021-02-10 11:35:36.318  INFO 9140 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2021-02-10 11:35:36.318  INFO 9140 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.41]
+2021-02-10 11:35:36.445  INFO 9140 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2021-02-10 11:35:36.446  INFO 9140 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2069 ms
+2021-02-10 11:35:36.730  INFO 9140 --- [main] org.neo4j.driver.Driver                  : Routing driver instance 1906565212 created for server address localhost:7687
+2021-02-10 11:35:37.055 DEBUG 9140 --- [main] o.s.w.f.CommonsRequestLoggingFilter      : Filter 'logFilter' configured for use
+2021-02-10 11:35:37.464  INFO 9140 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@5d9d2119, org.springframework.security.web.context.SecurityContextPersistenceFilter@44dfdd58, org.springframework.security.web.header.HeaderWriterFilter@539c4830, org.springframework.web.filter.CorsFilter@5a4464c5, org.springframework.security.web.authentication.logout.LogoutFilter@430df350, com.movieknights.server.jwt.AuthTokenFilter@88b76f2, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@72a8361b, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@696fad31, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7ae590f6, org.springframework.security.web.session.SessionManagementFilter@29d070c7, org.springframework.security.web.access.ExceptionTranslationFilter@4645679e, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@29bd85db]
+2021-02-10 11:35:37.522  INFO 9140 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2021-02-10 11:35:37.755  INFO 9140 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 5050 (http) with context path ''
+2021-02-10 11:35:37.763  INFO 9140 --- [main] c.m.server.MovieknightsApplication       : Started MovieknightsApplication in 4.106 seconds (JVM running for 4.879)
+2021-02-10 11:35:40.194  INFO 9140 --- [http-nio-5050-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2021-02-10 11:35:40.194  INFO 9140 --- [http-nio-5050-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2021-02-10 11:35:40.195  INFO 9140 --- [http-nio-5050-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2021-02-10 11:35:40.231 DEBUG 9140 --- [http-nio-5050-exec-1] o.s.w.f.CommonsRequestLoggingFilter      : Before request [GET /rest/movies/page/2]
+2021-02-10 11:35:41.054 DEBUG 9140 --- [http-nio-5050-exec-1] o.s.w.f.CommonsRequestLoggingFilter      : REQUEST DATA: GET /rest/movies/page/2]
+2021-02-10 11:35:47.458 DEBUG 9140 --- [http-nio-5050-exec-2] o.s.w.f.CommonsRequestLoggingFilter      : Before request [GET /rest/movies/page/1]
+2021-02-10 11:35:47.595 DEBUG 9140 --- [http-nio-5050-exec-2] o.s.w.f.CommonsRequestLoggingFilter      : REQUEST DATA: GET /rest/movies/page/1]
+2021-02-10 11:35:48.061 DEBUG 9140 --- [http-nio-5050-exec-3] o.s.w.f.CommonsRequestLoggingFilter      : Before request [GET /rest/movies/page/0]
+2021-02-10 11:35:48.238 DEBUG 9140 --- [http-nio-5050-exec-3] o.s.w.f.CommonsRequestLoggingFilter      : REQUEST DATA: GET /rest/movies/page/0]
