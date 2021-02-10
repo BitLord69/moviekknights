@@ -35,5 +35,11 @@ export default function EventHelper(){
     event.booked = true;
   }
 
-  return { event, events, eventsToBook, showEventForm, addEventToCalendar, createEvent }
+  async function removeEvent(eventToRemove) {
+    await extFetch("rest/calendar/delete/" + eventToRemove, "DELETE", undefined, true)
+  }
+
+
+
+  return { event, events, eventsToBook, showEventForm, addEventToCalendar, createEvent, removeEvent }
 }

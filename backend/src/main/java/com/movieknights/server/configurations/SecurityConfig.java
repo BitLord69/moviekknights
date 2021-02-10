@@ -39,6 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .antMatchers("/rest/calendar/freebusy").authenticated()
         .antMatchers("/rest/calendar/personal").authenticated()
+        .antMatchers("/rest/calendar/delete/").authenticated()
         .antMatchers("/rest/date").permitAll()
         .antMatchers(HttpMethod.POST,"/rest/calendar/add").authenticated()
         .antMatchers("/api/auth/whoami").permitAll()
