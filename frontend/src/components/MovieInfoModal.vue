@@ -2,8 +2,8 @@
   <div class="overlay">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header">
-          <Button @click="toggleConfirmation">Skapa event</Button>
+        <div class="modal-header" :class="{notLoggedIn: !isLoggedIn}">
+          <Button v-if="isLoggedIn" @click="toggleConfirmation">Skapa event</Button>
           <Button icon="pi pi-times" @click="$parent.state.showMovieInfo = false" />
         </div>
       <Dialog header="Bekräfta" :visible="state.displayConfirmation" :style="{width: '350px'}" :modal="true">
@@ -22,11 +22,13 @@
             <img :src="movie.posterPath != null ? movie.posterPath : '/img/noimage.png'" />
           </div>
           <div class="info">
-            <h3 class="p-m-0">{{movie.title}} ({{movie.releaseDate.slice(0, 4)}})</h3>
+            <h3 class="p-m-0">{{movie.title}} <span v-if="movie.releaseDate">({{movie.releaseDate.slice(0, 4)}})</span></h3>
             <span v-if="movie.title.toLowerCase() != movie.originalTitle.toLowerCase()"><em>{{movie.originalTitle}}</em></span>
             <hr style="" />
             <span>Speltid: {{time()}}</span>
             <span>Genre(s): {{movie.genres.map(g => g.name ).join(', ')}}</span>
+            <span v-if="movie.imdbId">IMDb: <a :href="'https://www.imdb.com/name/' + movie.imdbId" target="_blank">Klicka här</a></span>
+            <span>Status: {{translateStatus(movie.status)}}</span>
             <span>
               Regisserad av:
                 <span v-for="(director, index) in movie.directors" :key="index">
@@ -54,7 +56,7 @@
               <div v-if="state.overview.length > 3">{{state.overview}} <span class="showMoreText" @click="toggleShowText()">{{state.showMoreText}}</span></div>
             </div>
           </div>
-          <div class="cast">
+          <div class="cast" v-if="movie.cast.length > 0">
             <div>
               <Paginator v-model:first="state.first" :rows="5" :totalRecords="state.castCount"
               template="PrevPageLink NextPageLink">
@@ -82,12 +84,15 @@
 import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import EventHelper from "@/modules/EventHelper"
+import UserHandler from "@/modules/UserHandler"
+
 export default {
   name: 'MovieInfoModal',
   props: {movie: Object, showMovieInfo: Boolean},
   setup(props){
 
     const { addEventToCalendar } = EventHelper();
+    const { isLoggedIn } = UserHandler();
     const router = useRouter();
     const state = reactive({
       showMore: false,
@@ -133,8 +138,26 @@ export default {
       state.showPersonInfo = !state.showPersonInfo;
       state.selectedPerson = person
     }
+
+    function translateStatus(status) {
+      switch(status) {
+        case "Rumoured":
+          return "Ryktas";
+        case "Planned":
+          return "Planerad";
+        case "In Production":
+          return "I produktion";
+        case "Post Production":
+          return "Postproduktion";
+        case "Released":
+          return "Släppt";
+        case "Canceled":
+          return "Inställd"
+      }
+      return ""
+    }
     
-    return { state, time, displayCast, toggleShowText, displayPersonInfo, addEventToCalendar, toggleConfirmation, router }
+    return { state, time, displayCast, toggleShowText, displayPersonInfo, addEventToCalendar, toggleConfirmation, router, isLoggedIn, translateStatus }
   }
 }
 </script>
@@ -144,6 +167,10 @@ export default {
 
 .modal-header {
   justify-content: space-between;
+}
+
+.notLoggedIn {
+  justify-content: flex-end !important;
 }
 
 .modal-body {

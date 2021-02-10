@@ -77,11 +77,17 @@ export default {
 			else if(state.movieListChosen == "composing") state.filmographyDC = moviesComposedBy.value;
       }
       
-      if (moviesActedIn.value && moviesActedIn.value.length > 0) getMoviesStarringPerson();
+      if (moviesActedIn.value && moviesActedIn.value.length > 0) fillFilmographyAIfEmpty();
     })
 
 		
     chooseMovieListToView(props.movieListChosen)
+
+    function fillFilmographyAIfEmpty() {
+      if (state.filmographyA.length == 0) {
+        getMoviesStarringPerson()
+      }
+    }
 
     function toggleShowText() {
       state.showMore = !state.showMore
@@ -96,11 +102,8 @@ export default {
 		}
 		
 		function getMoviesStarringPerson() {
-      console.log("moviesActedIn: ", moviesActedIn.value);
       let temp = moviesActedIn.value;
-      console.log("temp: ", temp);
 			temp.forEach(m => {
-        console.log("film: ", m);
         m.cast.forEach(p => {
 					if(p.person.id == props.person.id) {
 						state.filmographyA.push({title: m.title, date: m.releaseDate, character: p.character})
