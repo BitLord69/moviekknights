@@ -18,6 +18,7 @@
         <Movie :movie="movie" v-for="(movie, index) in state.pagMovies" :key="index" @click="displayMovieInfo(movie)"/>
     </div>
         <MovieInfoModal v-if="state.showMovieInfo" :movie="state.selectedMovie"/>
+        <PersonInfoModal v-if="state.showPersonInfo" :person="state.selectedPerson" :movies="state.pagMovies" :movieListChosen="state.movieListChosen" />
   </div>
 </template>
 
@@ -27,10 +28,11 @@ import Movie from "@/components/Movie.vue";
 import MovieInfoModal from "@/components/MovieInfoModal.vue";
 import MovieHelper from "@/modules/MovieHelper";
 import AutoComplete from 'primevue/autocomplete';
+import PersonInfoModal from '@/components/PersonInfoModal';
 
 export default {
   name: "Movies",
-  components: { Movie, MovieInfoModal, AutoComplete },
+  components: { Movie, MovieInfoModal, AutoComplete, PersonInfoModal },
   setup(){
     const { getMovieCount, movieCount, movieError, getMoviesByPagination,
      getMoviesBySearch, moviesByPagination, moviesBySearch } = MovieHelper();
@@ -42,6 +44,8 @@ export default {
       selectedMovie: null,
       searchTerm: '',
       filteredMovies: moviesByPagination.value,
+      selectedPerson: null,
+      movieListChosen: "",
     })
 
     watchEffect(async () => {
@@ -104,6 +108,10 @@ export default {
   .paginator {
     grid-row: 1/2;
     grid-column: 3/11;
+    .p-paginator-left-content {
+      width:33%;
+      margin-right: 0;
+  }
   }
 
   #movie-page{
@@ -133,13 +141,12 @@ export default {
     justify-content: space-between;
   }
 
-  .p-autocomplete-panel {
-    background-color: $bg-primary;
+  .p-ink-active {
+    border: $border-hover !important;
   }
 
-  .p-paginator-left-content {
-    width:33%;
-    margin-right: 0 !important;
+  .p-autocomplete-panel {
+    background-color: $bg-primary;
   }
 
   .p-paginator-right-content {
