@@ -202,7 +202,29 @@ button{
   }
 }
 
+@media only screen and (max-height: 800px) {
+  .modal-dialog {
+    margin: 1% auto;
+  }
+
+  .modal-body {
+    grid-template-columns: 175px auto;
+  }
+  
+  .poster img {
+    width: 160px;
+    height:240px;
+  }
+
+  .modal-header {
+    padding: .5rem;
+  }
+}
+
 @media only screen and (max-width: 800px) {
+  .modal-body {
+    grid-template-columns: 175px auto;
+  }
   .modal-dialog {
     width: 94%;
   }
@@ -218,8 +240,8 @@ button{
   }
 
   .modal-header {
-  padding: .5rem;
-}
+    padding: .5rem;
+  }
 }
 </style>
 

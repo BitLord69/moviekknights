@@ -108,10 +108,8 @@ export default {
 					if(p.person.id == props.person.id) {
 						state.filmographyA.push({title: m.title, date: m.releaseDate, character: p.character})
 					}
-					
         });
 			});
-			//state.filmographyA = state.filmographyA.sort((a, b) => b.date - a.date)
     }
 
     return { state, moment, toggleShowText, chooseMovieListToView }
@@ -134,7 +132,7 @@ export default {
 }
 
 .modal-body {
-  grid-template-rows: 315px auto minmax(50px, 390px);
+  grid-template-rows: 315px minmax(0px, 20%) 300px;
   grid-template-areas:
     "poster info"
     "biography biography"
@@ -172,12 +170,18 @@ export default {
 
 @media only screen and (max-width: 800px) {
   .modal-body {
-    grid-template-rows: 255px auto auto minmax(50px, 190px);
+    grid-template-rows: 255px auto auto 190px;
     grid-template-areas:
       "poster poster"
       "info info"
       "biography biography"
       "filmography filmography";
+  }
+}
+
+@media only screen and (max-height: 800px) {
+.modal-body {
+    grid-template-rows: 255px minmax(0px, 20%) 190px;
   }
 }
 </style>

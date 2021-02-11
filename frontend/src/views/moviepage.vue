@@ -1,6 +1,6 @@
 <template>
   <div class="movies">
-    
+
     <Paginator :rows="18" :totalRecords="movieCount" @page="onPage($event)" class="paginator"
       template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
       currentPageReportTemplate="({currentPage} av {totalPages})">
@@ -152,4 +152,36 @@ export default {
     justify-content: flex-end;
     margin-left: 0 !important;
   }
+
+@media only screen and (max-width: 1250px) {
+  .paginator {
+    grid-column: 1/12;
+  }
+
+  #movie-page{
+    grid-column: 1/12;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .movies {
+    grid-template-rows: 125px 1fr 1fr 1fr;
+  }
+
+  .paginator {
+    .p-paginator-left-content {
+      width:100%;
+      justify-content: center;
+    }
+  }
+
+  #movie-page{
+    grid-column: 1/12;
+  }
+
+  .p-paginator-right-content {
+    width:100%;
+    justify-content: center;
+  }
+}
 </style>

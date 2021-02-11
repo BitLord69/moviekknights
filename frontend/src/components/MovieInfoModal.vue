@@ -175,7 +175,7 @@ export default {
 
 .modal-body {
   height: 90%;
-  grid-template-rows: 315px auto auto;
+  grid-template-rows: 315px minmax(0px, 20%) auto;
   grid-template-areas:
     "poster info"
     "overview overview"
@@ -200,6 +200,7 @@ export default {
 
 .overview {
   grid-area: overview;
+  overflow-y: auto;
   z-index: 2;
 }
 .cast {
@@ -249,6 +250,17 @@ export default {
       "info info"
       "overview overview"
       "cast cast";
+  }
+}
+
+@media only screen and (max-height: 800px) {
+  .characterBody img {
+    height: 70px;
+    width: 70px;
+  }
+
+  .modal-body {
+    grid-template-rows: 255px minmax(0px, 20%) auto;
   }
 }
 </style>
