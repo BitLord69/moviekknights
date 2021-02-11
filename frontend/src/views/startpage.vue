@@ -3,7 +3,7 @@
     <img alt="Vue logo" style="width: 30%;" src="/img/movieknightslogov3.png" />
     <h1>Välkommen till Movie knights</h1>
     <h2>Med hjälp av Google Calendar och vår filmdatabas, kan du boka in filmkvällar direkt i din kalender.</h2>
-    <h3>Antal filmer i vår databas: {{movieCount}}</h3>
+    <h3>Antal filmer i vår databas: {{new Intl.NumberFormat().format(movieCount)}}</h3>
   </div>
 </template>
 

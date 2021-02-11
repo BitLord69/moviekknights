@@ -40,18 +40,18 @@ public class DBUpdate implements Runnable {
   public void run() {
     System.out.printf("In DBUpdate.run, starting checks...\n");
     long lastId = checkDB();
-//    System.out.printf("After checkDB, lastID: %s\n", lastId);
-//    try {
-//      downloadMovies(lastId);
-//    } catch (InterruptedException e) {
-//      e.printStackTrace();
-//    }
+    System.out.printf("After checkDB, lastID: %s\n", lastId);
+    try {
+      downloadMovies(lastId);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
   }
 
   private void downloadMovies(long lastId) throws InterruptedException {
     ExecutorService pool = Executors.newFixedThreadPool(10);
 
-    for (long id = 1l; id <= lastId; id++) { //Your ArrayList
+    for (long id = lastId; id >= 1; id--) { //Your ArrayList
       pool.execute(new DownloadMovieTask(id, movieService));
     }
 

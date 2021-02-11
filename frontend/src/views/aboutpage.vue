@@ -5,7 +5,7 @@
     <p>
       JWT är en standard som innehåller information i form av ett JSON objekt,
       som på ett säkert sätt skickas mellan olika parter. Den innehåller
-      följande 3 delar;
+      följande tre delar:
     </p>
     <ul>
       <li>

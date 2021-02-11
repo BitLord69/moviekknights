@@ -1,18 +1,5 @@
 <template>
   <div class="calendar-container">
-    <div v-if="!showEventForm && eventsToBook.length > 0" class="showEventForm" @click="showEventForm = !showEventForm"> >> </div>
-    <teleport to="#app">
-    <div class="event-container" v-if="showEventForm">
-      <Suspense>
-        <template #default>
-          <Event />
-        </template>
-        <template #fallback>
-          <h1>Laddar evenemang</h1>
-        </template>
-      </Suspense>
-    </div>
-    </teleport>
     <Suspense>
       <template #default>
         <Calendar />
@@ -26,17 +13,11 @@
 
 <script>
 
-import Event from '@/components/Event'
 import Calendar from "@/components/Calendar"
-import EventHelper from '@/modules/EventHelper';
 
 export default {
-  components: { Calendar, Event },
-  setup() {
-    const { showEventForm, eventsToBook } = EventHelper();
-    
-    return { showEventForm, eventsToBook }
-  },
+  components: { Calendar },
+  
 };
 </script>
 

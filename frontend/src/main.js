@@ -25,7 +25,11 @@ app.use(VueGapi, {
   discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
   scope: 'https://www.googleapis.com/auth/calendar'
 })
-app.use(PrimeVue, { ripple: true });
+app.use(PrimeVue, { ripple: true, locale: {
+  dayNamesMin: ["sö", "må", "ti", "on", "to", "fr", "lö"],
+  monthNames: ["januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"],
+  firstDayOfWeek: 1,
+} });
 app.use(router);
 app.use(ToastService);
 app.component("Paginator", Paginator);
