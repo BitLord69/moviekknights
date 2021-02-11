@@ -5,7 +5,7 @@
     <router-link to="/movies">Filmer</router-link> |
     <router-link to="/about">Om tekniken</router-link> |
     <span v-if="isLoggedIn">
-      <router-link to="/calendar">Kalendern</router-link> |
+      <router-link to="/calendar">Kalender</router-link> |
       <router-link to="/logmeout">Logga ut</router-link>
       </span>
       <span v-else>
@@ -15,7 +15,6 @@
 </template>
 
 <script>
-
 import UserHandler from "@/modules/UserHandler";
 import { defineComponent, watchEffect } from "vue";
 import { useToast } from "primevue/usetoast";
