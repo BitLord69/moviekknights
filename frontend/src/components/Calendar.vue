@@ -41,28 +41,26 @@ components: { FullCalendar, InputSwitch },
 		const result = ref(null);
 		const refreshKey = ref(0);
 		const isPrivate = ref(false);
-		let startOfMonth = ref(moment().startOf('month').format("yyyy-MM-DDTHH:mm:ss"));
-		let endOfMonth = ref(moment().endOf('month').format("yyyy-MM-DDTHH:mm:ss"));
-
+		let startOfMonth = ref(null);
+		let endOfMonth = ref(null);
+		
     let state = reactive({
 			showRemoveDialog: false,
 			eventToRemove: null,
-			dates: {
-				start: startOfMonth.value,
-				end: endOfMonth.value,
-			},
+			calendar: null,
+			refresh: false,
       options: {
 				plugins:[dayGridPlugin, timeGridPlugin, interactionPlugin],
-				initialDate: startOfMonth,
+				initialDate: moment().startOf('month').format("yyyy-MM-DD"),
 				headerToolbar: {
 					left: 'prev,next,today',
 					center: 'title',
 					right: 'dayGridMonth,timeGridWeek,timeGridDay',
 				},
 				editable: false,
-				handleWindowResize: true,
+				height: 'auto',
 				contentHeight: "auto",
-				height: "auto",
+				handleWindowResize: true,
 				eventOverlap: false,
 				eventDrop: (e) => {
 					event.start = e.event.start;
@@ -71,6 +69,8 @@ components: { FullCalendar, InputSwitch },
 				slotMinTime: "00:00:00",
 				firstDay: 1,
 				locale: svLocale,
+				showNonCurrentDates: false,
+				fixedWeekCount: false,
 				eventClick: (e) => {
 					if(isPrivate.value){
 						state.eventToRemove = e.event._def.publicId;
@@ -78,13 +78,11 @@ components: { FullCalendar, InputSwitch },
 						console.log(e.event._def);
 					}
 				},
-				/* datesSet: async (e) => {
-					console.log("Tjosan hejsan, e:", e);
+				datesSet: async (e) => {
 					startOfMonth.value = e.startStr;
 					endOfMonth.value = e.endStr;
-					await getFreeBusy()
-					console.log("EVENTS I datesSet: ", events);
-				} */
+					console.log("datesSet: ", events);
+				} 
       },
 		})
 		
@@ -94,31 +92,38 @@ components: { FullCalendar, InputSwitch },
 			} else {
 				await getFreeBusy();
 			}
-			//refreshKey.value++;
+			console.log("watchEffect isPrivate");
 		});
-		// eslint-disable-next-line
-		watch(startOfMonth, (cur, prev) => {
-			console.log("WATCHERN!\n", cur, " \n", prev);
-			refreshKey.value++;
-		}) 
+		
 
+		watch(startOfMonth, async (cur, prev) => {
+			if(!isPrivate.value){
+				await getFreeBusy()
+			}
+			state.options.initialDate = cur;
+			console.log("watcher - startOfMonth", prev);
+			refreshKey.value++;
+		})
+	
 		async function getFreeBusy() {
-			result.value = await extFetch("/rest/calendar/freebusy/" + startOfMonth.value + "/" + endOfMonth.value, "GET", undefined, true);
-			events.length = 0;
-			state.options.editable = false;
-			Object.entries(result.value.calendars).forEach((calendar) => {
-				calendar[1].busy.forEach((event) => {
-					let start = new Date(event.start.value).toLocaleString();
-					let end = new Date(event.end.value).toLocaleString();
-					events.push({
-						id: events.length + 1,
-						title: "Busy",
-						start: start,
-						end: end,
-						editable: false,
+			if(startOfMonth.value){
+				result.value = await extFetch("/rest/calendar/freebusy/" + startOfMonth.value + "/" + endOfMonth.value, "GET", undefined, true);
+				events.length = 0;
+				state.options.editable = false;
+				Object.entries(result.value.calendars).forEach((calendar) => {
+					calendar[1].busy.forEach((event) => {
+						let start = new Date(event.start.value).toLocaleString();
+						let end = new Date(event.end.value).toLocaleString();
+						events.push({
+							id: events.length + 1,
+							title: "Busy",
+							start: start,
+							end: end,
+							editable: false,
+						});
 					});
 				});
-			});
+			}
 		}
 
 		async function getPersonal() {

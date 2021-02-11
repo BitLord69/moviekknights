@@ -52,10 +52,7 @@ public class CalendarController {
   @GetMapping("/freebusy/{start}/{end}")
   public ResponseEntity<?> getFreeBusy(@PathVariable DateTime start, @PathVariable DateTime end) {
     List<User> users = userRepo.findAll();
-    DateTime dateMin = new DateTime(String.valueOf(LocalDateTime.now().atOffset(ZoneOffset.ofHours(1)).withDayOfMonth(1).withSecond(0).withMinute(0).withHour(0)));
-    DateTime dateMax = new DateTime(String.valueOf(LocalDateTime.now().atOffset(ZoneOffset.ofHours(1)).with(TemporalAdjusters.lastDayOfMonth()).withSecond(59).withMinute(59).withHour(23)));
-    System.out.println("Start datum: " + start + "\nSlut datum: " + end);
-    System.out.println("dateMin: " + dateMin + "\ndateMax: " + dateMax);
+    System.out.printf("\nStart: %s\nEnd: %s\n", start, end);
     Calendar calendar = getGoogleCalendar();
 
     Calendar.Freebusy freebusy = calendar.freebusy();
