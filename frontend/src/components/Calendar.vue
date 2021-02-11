@@ -1,84 +1,201 @@
 <template>
-  <div v-if="isLoggedIn && events && events.length > 0" class="calendar">
-		<FullCalendar :events="events" :options="state.options"/>
+  <div class="calendar">
+		<div class="p-grid p-jc-center p-ai-center">
+			<h3 class="p-m-0 p-col-3">Visa privat kalender: </h3>
+			<InputSwitch class="p-col-1" v-model="isPrivate"/>
+		</div>
+		<FullCalendar :events="events" :options="state.options" :key="refreshKey" />
+		<Dialog header="Radera evenemang?" :visible="state.showRemoveDialog" :style="{width: '350px'}" :modal="true">
+        <div class="confirmation-content">
+          <i class="pi pi-exclamation-triangle p-mr-3" style="font-size: 2rem" />
+          <span>Vill du radera valt evenemang?</span>
+        </div>
+    <template #footer>
+        <Button label="Nej" icon="pi pi-times" @click="state.showRemoveDialog = !state.showRemoveDialog;" class="p-button-text"/>
+        <Button label="Ja" icon="pi pi-check" @click="doRemoveEvent"
+         class="p-button-text" autofocus />
+    </template>
+      </Dialog>
   </div>
-	<div v-else><h1>Här var det tomt...</h1></div>
 </template>
 
 <script>
 import { extFetch } from "@/modules/extFetch";
-import { ref, reactive } from "vue";
+import { ref, reactive, watchEffect, watch } from "vue";
 import FullCalendar from 'primevue/fullcalendar';
+import InputSwitch from 'primevue/inputswitch';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import svLocale from '@fullcalendar/core/locales/sv'
 import UserHandler from '@/modules/UserHandler';
 import EventHelper from '@/modules/EventHelper';
+import moment from "moment";
 
 export default {
-components: { FullCalendar },
+components: { FullCalendar, InputSwitch },
   async setup() {
-		const { event, events, createEvent } = EventHelper();
 		const {isLoggedIn} = UserHandler();
+		const { event, events, createEvent, removeEvent } = EventHelper();
+
 		const result = ref(null);
+		const refreshKey = ref(0);
+		const isPrivate = ref(false);
+		let startOfMonth = ref(null);
+		let endOfMonth = ref(null);
 		
     let state = reactive({
-			updateCalendar: 0,
+			showRemoveDialog: false,
+			eventToRemove: null,
+			calendar: null,
+			refresh: false,
       options: {
 				plugins:[dayGridPlugin, timeGridPlugin, interactionPlugin],
-				initialDate: '2021-02-01',
+				initialDate: moment().startOf('month').format("yyyy-MM-DD"),
 				headerToolbar: {
-					left: 'prev,next',
+					left: 'prev,next,today',
 					center: 'title',
-					right: 'dayGridMonth,timeGridWeek,timeGridDay'
+					right: 'dayGridMonth,timeGridWeek,timeGridDay',
 				},
-				editable: true,
-				handleWindowResize: true,
+				editable: false,
+				height: 'auto',
 				contentHeight: "auto",
-				height: "auto",
+				handleWindowResize: true,
 				eventOverlap: false,
 				eventDrop: (e) => {
 					event.start = e.event.start;
 					event.end = e.event.end;
 				},
-				slotMinTime: "08:00:00",
+				slotMinTime: "00:00:00",
 				firstDay: 1,
 				locale: svLocale,
+				showNonCurrentDates: false,
+				fixedWeekCount: false,
+				eventClick: (e) => {
+					if(isPrivate.value){
+						state.eventToRemove = e.event._def.publicId;
+						state.showRemoveDialog = true;
+						console.log(e.event._def);
+					}
+				},
+				datesSet: async (e) => {
+					startOfMonth.value = e.startStr;
+					endOfMonth.value = e.endStr;
+					console.log("datesSet: ", events);
+				} 
       },
 		})
 		
-		if(!isLoggedIn.value) return
-		events.length = 0;
-		result.value = await extFetch("/rest/calendar/freebusy", "GET", undefined, true);
-		Object.entries(result.value.calendars).forEach((calendar) => {
-			calendar[1].busy.forEach((event) => {
-				let start = new Date(event.start.value).toLocaleString();
-				let end = new Date(event.end.value).toLocaleString();
-				events.push({
-					id: events.length + 1,
-					title: "Busy",
-					start: start,
-					end: end,
-					editable: false,
-				});
-			});
+		watchEffect(async () => {
+			if (isPrivate.value) {
+				await getPersonal();
+			} else {
+				await getFreeBusy();
+			}
+			console.log("watchEffect isPrivate");
 		});
 		
+
+		watch(startOfMonth, async (cur, prev) => {
+			if(!isPrivate.value){
+				await getFreeBusy()
+			}
+			state.options.initialDate = cur;
+			console.log("watcher - startOfMonth", prev);
+			refreshKey.value++;
+		})
+	
+		async function getFreeBusy() {
+			if(startOfMonth.value){
+				result.value = await extFetch("/rest/calendar/freebusy/" + startOfMonth.value + "/" + endOfMonth.value, "GET", undefined, true);
+				events.length = 0;
+				state.options.editable = false;
+				Object.entries(result.value.calendars).forEach((calendar) => {
+					calendar[1].busy.forEach((event) => {
+						let start = new Date(event.start.value).toLocaleString();
+						let end = new Date(event.end.value).toLocaleString();
+						events.push({
+							id: events.length + 1,
+							title: "Busy",
+							start: start,
+							end: end,
+							editable: false,
+						});
+					});
+				});
+			}
+		}
+
+		async function getPersonal() {
+			result.value = await extFetch("/rest/calendar/personal", "GET", undefined, true);
+			events.length = 0;
+			state.options.editable = true;
+			result.value.forEach(event => {
+				if (event.status !== 'cancelled') {
+					let start = new Date(JSON.parse(JSON.stringify(event.start)).dateTime.value).toLocaleString();				
+					let end = new Date(JSON.parse(JSON.stringify(event.end)).dateTime.value).toLocaleString();
+					events.push({
+						id: event.id,
+						title: event.summary,
+						start: start,
+						end: end,
+						editable: true,
+						classNames:'text-class',
+					});
+				}
+			});
+		}
+
 		if(event.id){
 			events.push(event);
 			event.id = null;
 		}
 		
+	async function doRemoveEvent() {
+		removeEvent(state.eventToRemove);
+		state.showRemoveDialog = !state.showRemoveDialog;
+		await getPersonal();
+		refreshKey.value++;
+	}
 
-    return { state, result, isLoggedIn, createEvent, events, event };
+    return { state, result, isLoggedIn, createEvent, events, event, isPrivate, refreshKey, doRemoveEvent };
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import "@/styles/_variables.scss";
+	
 	.calendar {
 		display: grid;
 		grid-column: 3/11;
+	}
+
+	.p-inputswitch-slider {
+		background: $bg-primary;
+	}
+
+	::v-deep(.fc-header-toolbar){
+		.fc-toolbar-chunk:first-child {
+			width:33%;
+			margin-right: 0 !important;
+		}
+
+		.fc-toolbar-chunk:last-child {
+			width:33%;
+			display: flex;
+			justify-content: flex-end;
+			margin-left: 0 !important;
+		}
+	}
+
+	::v-deep(.fc-event), ::v-deep(.fc-event-main) {
+		color: $text-secondary !important;
+		border: $border-primary !important;
+		background-color: $bg-secondary !important;
+	}
+
+	::v-deep(.fc-daygrid-day.fc-day-today) {
+		background-color: lighten($bg-secondary, 5%);
 	}
 </style>

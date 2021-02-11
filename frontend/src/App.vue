@@ -67,6 +67,23 @@ h3 {
     color: $text-secondary;
   }
 }
+
+button{
+  margin: 0 2px !important;
+  color: $text-secondary !important;
+  font-family: inherit !important;
+  border: $border-primary !important;
+  background-color: $bg-secondary !important;
+  &:hover{
+    border: $border-hover !important;
+  }
+  &:focus{
+    box-shadow: $boxshadow !important;
+  }
+  .p-button-icon{
+    color: $text-secondary;
+  }
+}
 </style>
 
 /**
