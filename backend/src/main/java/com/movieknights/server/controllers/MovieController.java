@@ -1,7 +1,7 @@
 package com.movieknights.server.controllers;
 
-import com.movieknights.server.services.MovieService;
 import com.movieknights.server.entities.Movie;
+import com.movieknights.server.services.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

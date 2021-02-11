@@ -1,4 +1,4 @@
-package com.movieknights.server.relationships;
+package com.movieknights.server.entities.relationships;
 
 
 import com.movieknights.server.entities.Person;

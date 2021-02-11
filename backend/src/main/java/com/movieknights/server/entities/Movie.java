@@ -1,11 +1,11 @@
 package com.movieknights.server.entities;
 
-import lombok.Data;
-import lombok.ToString;
-import lombok.NoArgsConstructor;
+import com.movieknights.server.entities.relationships.HasActor;
 import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.neo4j.core.schema.Id;
-import com.movieknights.server.relationships.HasActor;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 

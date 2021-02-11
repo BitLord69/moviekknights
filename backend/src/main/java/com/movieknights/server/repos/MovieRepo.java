@@ -1,14 +1,10 @@
 package com.movieknights.server.repos;
 
 import com.movieknights.server.entities.Movie;
-import com.movieknights.server.entities.Person;
-import com.movieknights.server.relationships.HasActor;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 @Repository

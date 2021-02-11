@@ -1,11 +1,14 @@
 package com.movieknights.server.services;
 
-import java.util.*;
-
-import com.movieknights.server.entities.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.movieknights.server.entities.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 public class UserDetailsImpl extends BaseDetailsImpl {
   private static final long serialVersionUID = 1L;

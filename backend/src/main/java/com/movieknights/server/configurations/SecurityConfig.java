@@ -67,17 +67,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   public AuthenticationManager authenticationManagerBean() throws Exception {
     return super.authenticationManagerBean();
   }
-
-//  @Override
-//  public void configure(WebSecurity web) throws Exception {
-//    // TokenAuthenticationFilter will ignore the below paths
-////    web.ignoring().antMatchers(
-////        HttpMethod.POST,
-////        "/api/auth/storeauthcode"
-////    );
-//////    web.ignoring().antMatchers(
-//////        HttpMethod.GET,
-//////        "/api/auth/whoami"
-//////    );
-//  }
 }

@@ -182,14 +182,4 @@ public class DBUpdate implements Runnable {
       e.printStackTrace();
     }
   }
-
-//  private void updateDbWithFile() {
-//    InputStream is = null;
-//    try {
-//      File file = new File(String.valueOf(inputFile));
-//        is = new FileInputStream(file);
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
-//  }
 }
