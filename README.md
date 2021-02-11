@@ -44,5 +44,10 @@ Medlemmar:<br/>
   ASSERT m.uuid IS UNIQUE;
   CREATE CONSTRAINT ON (m:MKGenre)
   ASSERT league.uuid IS UNIQUE;
-
+  ```
+  
+  - Create an index for the title
+  ```
+  CREATE INDEX index_title FOR (n:MKMovie)
+  ON (n.title)
   ```
