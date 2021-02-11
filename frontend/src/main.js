@@ -12,6 +12,7 @@ import Toast from 'primevue/toast';
 import Dropdown from 'primevue/dropdown';
 import Calendar from 'primevue/calendar';
 import Dialog from 'primevue/dialog';
+import InputSwitch from "primevue/inputswitch";
 
 import "primeflex/primeflex.css";
 import "primeicons/primeicons.css";
@@ -38,6 +39,7 @@ app.component("Toast", Toast);
 app.component("Dropdown", Dropdown);
 app.component("PrimeCalendar", Calendar);
 app.component("Dialog", Dialog);
+app.component("InputSwitch", InputSwitch);
 
 app.mount('#app')
 

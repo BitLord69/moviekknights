@@ -5,6 +5,7 @@ const url = "/rest/person"
 const moviesDirectedBy = ref(null);
 const moviesComposedBy = ref(null);
 const moviesActedIn = ref(null);
+const personCount = ref(null);
 const personError = ref(null);
 
 export default function PersonHelper(){
@@ -36,5 +37,14 @@ export default function PersonHelper(){
     }
   }
 
-  return { getMoviesDirectedByPerson, getMoviesComposedByPerson, getMoviesPersonActedIn, moviesDirectedBy, moviesComposedBy, moviesActedIn }
+  async function getPersonCount(){
+    try {
+        personCount.value = await extFetch(url + "/count");
+    } catch (err) {
+        personError.value = err;
+      return;
+    }
+  }
+
+  return { getMoviesDirectedByPerson, getMoviesComposedByPerson, getMoviesPersonActedIn, getPersonCount, moviesDirectedBy, moviesComposedBy, moviesActedIn, personCount }
 }

@@ -9,6 +9,7 @@ $link-active: $text-secondary;
 //Background colors
 $bg-primary: #232931;
 $bg-secondary: #393e46;
+$bg-tertiary: $text-secondary;
 
 //Border styling
 $border-primary: 1px solid darken($text-primary, 60%);

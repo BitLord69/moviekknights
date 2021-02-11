@@ -5,7 +5,7 @@
       template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
       currentPageReportTemplate="({currentPage} av {totalPages})">
       <template #left>
-        &nbsp;
+        <InputSwitch v-model="state.hideAdult" />&nbsp;Censurera vuxenfilmer
       </template>
       <template #right>
         <AutoComplete v-model="state.searchTerm" :suggestions="state.filteredMovies" @complete="searchMovie($event)" field="title" />
@@ -44,6 +44,7 @@ export default {
       filteredMovies: moviesByPagination.value,
       selectedPerson: null,
       movieListChosen: "",
+      hideAdult: true,
     })
 
     watchEffect(async () => {
@@ -105,7 +106,9 @@ export default {
     .p-paginator-left-content {
       width:33%;
       margin-right: 0;
-  }
+      display: flex;
+      justify-content: flex-start;
+    }
   }
 
   #movie-page{

@@ -143,6 +143,24 @@ hr {
   color: $text-secondary;
 }
 
+.p-inputswitch-slider {
+  background: $bg-primary;
+
+}
+
+.p-inputswitch.p-focus .p-inputswitch-slider{
+  box-shadow: 0 0 0 1px $text-secondary !important;
+  border-radius: 30px;
+}
+
+.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+    background: $bg-tertiary !important;
+}
+
+.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider:before {
+    background: $bg-secondary !important;
+}
+
 button{
   margin: 0 2px !important;
   color: $text-secondary !important;

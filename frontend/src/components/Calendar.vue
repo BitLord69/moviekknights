@@ -57,7 +57,6 @@
 import { extFetch } from "@/modules/extFetch";
 import { ref, reactive, watch, onMounted } from "vue";
 import FullCalendar from "primevue/fullcalendar";
-import InputSwitch from "primevue/inputswitch";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -68,7 +67,7 @@ import EventHelper from "@/modules/EventHelper";
 import moment from "moment";
 
 export default {
-  components: { FullCalendar, InputSwitch, Event },
+  components: { FullCalendar, Event },
   async setup() {
     const { isLoggedIn } = UserHandler();
     const {
@@ -267,10 +266,6 @@ export default {
 .calendar {
   display: grid;
   grid-column: 3/11;
-}
-
-.p-inputswitch-slider {
-  background: $bg-primary;
 }
 
 ::v-deep(.fc-header-toolbar) {
