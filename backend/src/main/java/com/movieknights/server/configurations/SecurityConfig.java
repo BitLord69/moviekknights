@@ -10,7 +10,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -39,11 +38,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
         .authorizeRequests()
         .antMatchers("/rest/calendar/freebusy").authenticated()
+        .antMatchers("/rest/calendar/personal").authenticated()
+        .antMatchers("/rest/calendar/delete/").authenticated()
         .antMatchers("/rest/date").permitAll()
         .antMatchers(HttpMethod.POST,"/rest/calendar/add").authenticated()
         .antMatchers("/api/auth/whoami").permitAll()
         .antMatchers("/api/auth/storeauthcode").permitAll()
-        .antMatchers("/api/auth/refreshtoken").permitAll()
+        .antMatchers("/api/auth/refreshtoken").authenticated()
         .antMatchers( "/").permitAll()
         .antMatchers(HttpMethod.GET, "/rest/movies/*").permitAll()
         .antMatchers(HttpMethod.GET, "/rest/movies/page/*").permitAll()
@@ -52,7 +53,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.GET, "/rest/person/composer/*").permitAll()
         .antMatchers(HttpMethod.GET, "/rest/person/actor/*").permitAll()
         .anyRequest().authenticated();
-    ;
 
     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
   }

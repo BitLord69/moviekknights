@@ -143,6 +143,23 @@ hr {
   color: $text-secondary;
 }
 
+button{
+  margin: 0 2px !important;
+  color: $text-secondary !important;
+  font-family: inherit !important;
+  border: $border-primary !important;
+  background-color: $bg-secondary !important;
+  &:hover{
+    border: $border-hover !important;
+  }
+  &:focus{
+    box-shadow: $boxshadow !important;
+  }
+  .p-button-icon{
+    color: $text-secondary;
+  }
+}
+
 @media only screen and (max-width: 1600px) {
   .modal-dialog {
     width: 45%;
@@ -170,10 +187,6 @@ hr {
 @media only screen and (max-width: 800px) {
   .modal-dialog {
     width: 94%;
-  }
-
-  .modal-body {
-    grid-template-columns: 175px auto;
   }
 
   .poster {

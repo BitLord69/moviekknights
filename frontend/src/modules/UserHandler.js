@@ -17,8 +17,6 @@ export default function UserHandler() {
   
   async function signInCallback(authResult) {
     if (authResult["code"]) {
-      // Hide the sign-in button now that the user is authorized
-      // Send the code to the server
       let result = await fetch("api/auth/storeauthcode", {
         method: "POST",
         headers: {

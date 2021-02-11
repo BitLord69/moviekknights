@@ -40,12 +40,12 @@ public class DBUpdate implements Runnable {
   public void run() {
     System.out.printf("In DBUpdate.run, starting checks...\n");
     long lastId = checkDB();
-    System.out.printf("After checkDB, lastID: %s\n", lastId);
-    try {
-      downloadMovies(lastId);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
+//    System.out.printf("After checkDB, lastID: %s\n", lastId);
+//    try {
+//      downloadMovies(lastId);
+//    } catch (InterruptedException e) {
+//      e.printStackTrace();
+//    }
   }
 
   private void downloadMovies(long lastId) throws InterruptedException {
