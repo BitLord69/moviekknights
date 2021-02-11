@@ -21,7 +21,7 @@
 
 <script>
 import { extFetch } from "@/modules/extFetch";
-import { ref, reactive, watchEffect, watch } from "vue";
+import { ref, reactive, watch, onMounted } from "vue";
 import FullCalendar from 'primevue/fullcalendar';
 import InputSwitch from 'primevue/inputswitch';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -41,10 +41,14 @@ components: { FullCalendar, InputSwitch },
 		const result = ref(null);
 		const refreshKey = ref(0);
 		const isPrivate = ref(false);
-		let startOfMonth = ref(null);
-		let endOfMonth = ref(null);
+		let dateSpan = reactive({
+			startOfMonth: null,
+			endOfMonth: null,
+		});
 		
-    let state = reactive({
+		const defaultView = ref('dayGridMonth');
+
+		let state = reactive({
 			showRemoveDialog: false,
 			eventToRemove: null,
 			calendar: null,
@@ -52,6 +56,7 @@ components: { FullCalendar, InputSwitch },
       options: {
 				plugins:[dayGridPlugin, timeGridPlugin, interactionPlugin],
 				initialDate: moment().startOf('month').format("yyyy-MM-DD"),
+				initialView: defaultView.value,
 				headerToolbar: {
 					left: 'prev,next,today',
 					center: 'title',
@@ -75,39 +80,45 @@ components: { FullCalendar, InputSwitch },
 					if(isPrivate.value){
 						state.eventToRemove = e.event._def.publicId;
 						state.showRemoveDialog = true;
-						console.log(e.event._def);
 					}
 				},
 				datesSet: async (e) => {
-					startOfMonth.value = e.startStr;
-					endOfMonth.value = e.endStr;
-					console.log("datesSet: ", events);
+					dateSpan.startOfMonth = e.startStr;
+					dateSpan.endOfMonth = e.endStr;
+					defaultView.value = e.view.type;
 				} 
       },
 		})
 		
-		watchEffect(async () => {
+		watch(isPrivate, async () => {
 			if (isPrivate.value) {
 				await getPersonal();
 			} else {
 				await getFreeBusy();
 			}
-			console.log("watchEffect isPrivate");
+			refreshKey.value++;
 		});
 		
 
-		watch(startOfMonth, async (cur, prev) => {
-			if(!isPrivate.value){
+		watch(dateSpan, async (cur,) => {
+			if (isPrivate.value) {
+				await getPersonal();
+			} else {
 				await getFreeBusy()
 			}
-			state.options.initialDate = cur;
-			console.log("watcher - startOfMonth", prev);
+
+			refreshKey.value++;
+			state.options.initialDate = cur.startOfMonth;
+			state.options.initialView = defaultView.value;
+		})
+
+		onMounted(() => {
 			refreshKey.value++;
 		})
-	
+
 		async function getFreeBusy() {
-			if(startOfMonth.value){
-				result.value = await extFetch("/rest/calendar/freebusy/" + startOfMonth.value + "/" + endOfMonth.value, "GET", undefined, true);
+			if(dateSpan.startOfMonth){
+				result.value = await extFetch("/rest/calendar/freebusy/" + dateSpan.startOfMonth + "/" + dateSpan.endOfMonth, "GET", undefined, true);
 				events.length = 0;
 				state.options.editable = false;
 				Object.entries(result.value.calendars).forEach((calendar) => {
@@ -127,7 +138,7 @@ components: { FullCalendar, InputSwitch },
 		}
 
 		async function getPersonal() {
-			result.value = await extFetch("/rest/calendar/personal", "GET", undefined, true);
+			result.value = await extFetch("/rest/calendar/personal/" + dateSpan.startOfMonth + "/" + dateSpan.endOfMonth, "GET", undefined, true);
 			events.length = 0;
 			state.options.editable = true;
 			result.value.forEach(event => {

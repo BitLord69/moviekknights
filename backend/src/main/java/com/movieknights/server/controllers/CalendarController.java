@@ -52,7 +52,6 @@ public class CalendarController {
   @GetMapping("/freebusy/{start}/{end}")
   public ResponseEntity<?> getFreeBusy(@PathVariable DateTime start, @PathVariable DateTime end) {
     List<User> users = userRepo.findAll();
-    System.out.printf("\nStart: %s\nEnd: %s\n", start, end);
     Calendar calendar = getGoogleCalendar();
 
     Calendar.Freebusy freebusy = calendar.freebusy();
@@ -80,10 +79,10 @@ public class CalendarController {
     return ResponseEntity.ok(res);
   }
 
-  @GetMapping("/personal")
-  public ResponseEntity<?> getPersonal() {
-    DateTime dateMin = new DateTime(String.valueOf(LocalDateTime.now().atOffset(ZoneOffset.ofHours(1)).withDayOfMonth(1).withSecond(0).withMinute(0).withHour(0)));
-    DateTime dateMax = new DateTime(String.valueOf(LocalDateTime.now().atOffset(ZoneOffset.ofHours(1)).with(TemporalAdjusters.lastDayOfMonth()).withSecond(59).withMinute(59).withHour(23)));
+  @GetMapping("/personal/{start}/{end}")
+  public ResponseEntity<?> getPersonal(@PathVariable DateTime start, @PathVariable DateTime end) {
+//    DateTime dateMin = new DateTime(String.valueOf(LocalDateTime.now().atOffset(ZoneOffset.ofHours(1)).withDayOfMonth(1).withSecond(0).withMinute(0).withHour(0)));
+//    DateTime dateMax = new DateTime(String.valueOf(LocalDateTime.now().atOffset(ZoneOffset.ofHours(1)).with(TemporalAdjusters.lastDayOfMonth()).withSecond(59).withMinute(59).withHour(23)));
     User user = getUser();
 
     Events events = null;
@@ -92,8 +91,8 @@ public class CalendarController {
     try {
       events = calendar.events()
           .list(user.getUsername())
-          .setTimeMin(dateMin)
-          .setTimeMax(dateMax)
+          .setTimeMin(start)
+          .setTimeMax(end)
           .setKey(API_KEY)
           .execute();
     } catch (IOException e) {
