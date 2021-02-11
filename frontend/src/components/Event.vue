@@ -48,7 +48,7 @@
         Starttid:
         <PrimeCalendar
           v-model="state.event.start"
-          dateFormat="dd/mm/yy"
+          dateFormat="yy-mm-dd"
           :showIcon="true"
           :showTime="true"
           :baseZIndex=15

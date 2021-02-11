@@ -1,13 +1,11 @@
 <template>
   <div class="movies">
-    <div>Antal filmer i db: {{movieCount}}</div>
     
     <Paginator :rows="18" :totalRecords="movieCount" @page="onPage($event)" class="paginator"
       template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
       currentPageReportTemplate="({currentPage} av {totalPages})">
       <template #left>
         &nbsp;
-        <!-- <Button type="button" icon="pi pi-refresh" @click="reset()"/> -->
       </template>
       <template #right>
         <AutoComplete v-model="state.searchTerm" :suggestions="state.filteredMovies" @complete="searchMovie($event)" field="title" />
@@ -58,7 +56,6 @@ export default {
     onMounted(async () => {
       await getMovieCount();
       await getMoviesByPagination(0);
-      //await getMovies();
     })
 
     function reset() {
@@ -81,9 +78,6 @@ export default {
         state.filteredMovies = moviesByPagination.value;
       }
       else {
-        // state.filteredMovies = moviesByPagination.value.filter((movie) => {
-        //     return movie.title.toLowerCase().startsWith(event.query.toLowerCase());
-        // });
         await getMoviesBySearch(event.query);
         state.filteredMovies = moviesBySearch.value;
       }
